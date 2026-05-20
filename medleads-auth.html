@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedLeads — Sign Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:     #0B1F3B;
+    --navy-2:   #0D2645;
+    --navy-3:   #0F4C81;
+    --navy-4:   #1a3a6b;
+    --teal:     #D4AF37;
+    --teal-dim: rgba(212,175,55,0.12);
+    --teal-bdr: rgba(212,175,55,0.35);
+    --white:    #F3EFE6;
+    --muted:    #7a9ab8;
+    --line:     #1a3356;
+    --red:      #ff4d6d;
+    --red-dim:  rgba(255,77,109,0.12);
+    --gold:     #f5a623;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+  }
+
+  /* noise */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .5;
+  }
+
+  /* grid bg */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse 70% 80% at 20% 50%, black 0%, transparent 75%);
+    opacity: .3; z-index: 0; pointer-events: none;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative; z-index: 1;
+    display: none;
+    min-height: 100vh;
+  }
+  .page.active { display: flex; }
+
+  /* ── AUTH PAGES (signup / login) ── */
+  .auth-page {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  /* Left panel */
+  .auth-left {
+    width: 440px;
+    flex-shrink: 0;
+    background: var(--navy-2);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-left-glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 65%);
+    bottom: -100px; left: -100px;
+    pointer-events: none;
+  }
+
+  .auth-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; margin-bottom: 56px;
+  }
+  .auth-logo-mark {
+    width: 34px; height: 34px; background: var(--teal); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    font-weight: 500; color: var(--navy);
+  }
+  .auth-logo-text {
+    font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white);
+  }
+  .auth-logo-text span { color: var(--teal); }
+
+  .auth-left-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; line-height: 1.15; letter-spacing: -1px;
+    margin-bottom: 20px;
+  }
+  .auth-left-title em { font-style: italic; color: var(--teal); }
+
+  .auth-left-sub {
+    color: var(--muted); font-size: 15px; line-height: 1.65;
+    margin-bottom: 48px;
+  }
+
+  .auth-left-stats {
+    display: flex; flex-direction: column; gap: 20px;
+    position: relative; z-index: 1;
+  }
+
+  .stat-row {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .stat-icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .stat-text { display: flex; flex-direction: column; gap: 2px; }
+  .stat-value {
+    font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white);
+  }
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); letter-spacing: .06em;
+  }
+
+  .auth-left-testimonial {
+    margin-top: auto;
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px;
+    position: relative; z-index: 1;
+  }
+  .testimonial-text {
+    font-family: 'DM Serif Display', serif; font-style: italic;
+    font-size: 15px; line-height: 1.6; color: var(--white);
+    margin-bottom: 14px;
+  }
+  .testimonial-byline {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .testimonial-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--teal);
+  }
+  .testimonial-name { font-size: 13px; font-weight: 600; }
+  .testimonial-role { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  /* Right panel — form */
+  .auth-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    animation: fadeUp .5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .auth-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px; letter-spacing: -.7px;
+    margin-bottom: 8px;
+  }
+  .auth-card-sub {
+    color: var(--muted); font-size: 14px; margin-bottom: 32px;
+  }
+  .auth-card-sub a {
+    color: var(--teal); text-decoration: none; font-weight: 600;
+    cursor: pointer;
+  }
+  .auth-card-sub a:hover { text-decoration: underline; }
+
+  /* Plan selector */
+  .plan-selector {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 28px;
+  }
+
+  .plan-opt {
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 10px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    text-align: center; position: relative;
+  }
+  .plan-opt:hover { border-color: var(--teal-bdr); }
+  .plan-opt.selected {
+    border-color: var(--teal);
+    background: var(--teal-dim);
+  }
+  .plan-opt-badge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: var(--navy);
+    font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+    padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+    font-weight: 500; letter-spacing: .06em;
+  }
+  .plan-opt-name {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--teal); text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: 4px;
+  }
+  .plan-opt-price {
+    font-family: 'DM Serif Display', serif; font-size: 22px;
+    color: var(--white); line-height: 1;
+  }
+  .plan-opt-price sup { font-size: 13px; vertical-align: super; }
+  .plan-opt-period {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--muted); margin-top: 2px;
+  }
+
+  /* Form fields */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+  .field-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
+  }
+
+  .field-input {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 8px; color: var(--white);
+    font-family: 'Instrument Sans', sans-serif; font-size: 14px;
+    padding: 12px 14px; outline: none; width: 100%;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field-input:focus {
+    border-color: var(--teal-bdr);
+    box-shadow: 0 0 0 3px var(--teal-dim);
+  }
+  .field-input.error { border-color: var(--red); }
+  .field-input::placeholder { color: var(--muted); }
+
+  .field-error {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--red); display: none;
+  }
+  .field-error.show { display: block; }
+
+  /* Password strength */
+  .pw-strength { display: flex; gap: 4px; margin-top: 6px; }
+  .pw-bar {
+    height: 3px; flex: 1; border-radius: 2px;
+    background: var(--line); transition: background .3s;
+  }
+  .pw-bar.weak   { background: var(--red); }
+  .pw-bar.medium { background: var(--gold); }
+  .pw-bar.strong { background: var(--teal); }
+
+  /* Divider */
+  .form-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0;
+  }
+  .form-divider-line { flex: 1; height: 1px; background: var(--line); }
+  .form-divider-text {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
+  }
+
+  /* Trial notice */
+  .trial-notice {
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .trial-notice-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .trial-notice-text {
+    font-size: 13px; color: var(--white); line-height: 1.5;
+  }
+  .trial-notice-text strong { color: var(--teal); }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 8px;
+    background: var(--teal); color: var(--navy);
+    font-family: 'Instrument Sans', sans-serif; font-size: 15px;
+    font-weight: 600; cursor: pointer; transition: opacity .2s;
+    position: relative; overflow: hidden;
+    margin-top: 4px;
+  }
+  .submit-btn:hover { opacity: .88; }
+  .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .submit-btn.loading::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.15) 50%, transparent 100%);
+    animation: shimmer 1s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+
+  .form-legal {
+    margin-top: 14px; font-size: 12px; color: var(--muted);
+    text-align: center; line-height: 1.55;
+  }
+  .form-legal a { color: var(--teal); text-decoration: none; }
+
+  /* ── PAYWALL GATE ── */
+  .paywall-page {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+    text-align: center;
+  }
+
+  .paywall-card {
+    background: var(--navy-2); border: 1px solid var(--teal-bdr);
+    border-radius: 16px; padding: 56px 48px;
+    max-width: 560px; width: 100%;
+    position: relative; overflow: hidden;
+    animation: fadeUp .5s ease both;
+  }
+
+  .paywall-card::before {
+    content: '';
+    position: absolute; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(47,134,199,0.10) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .paywall-card > * { position: relative; }
+
+  .paywall-lock {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 24px;
+  }
+
+  .paywall-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--teal); text-transform: uppercase; letter-spacing: .1em;
+    margin-bottom: 12px;
+  }
+
+  .paywall-title {
+    font-family: 'DM Serif Display', serif; font-size: 34px;
+    letter-spacing: -1px; line-height: 1.15; margin-bottom: 14px;
+  }
+  .paywall-title em { font-style: italic; color: var(--teal); }
+
+  .paywall-sub {
+    color: var(--muted); font-size: 15px; line-height: 1.65;
+    margin-bottom: 32px;
+  }
+
+  /* Preview blurred results */
+  .paywall-preview {
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden; margin-bottom: 32px;
+    position: relative;
+  }
+
+  .preview-row {
+    padding: 14px 18px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .preview-row:last-child { border-bottom: none; }
+  .preview-row.blurred { filter: blur(5px); user-select: none; }
+
+  .preview-left { display: flex; align-items: center; gap: 12px; }
+  .preview-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--teal);
+    flex-shrink: 0;
+  }
+  .preview-name { font-size: 14px; font-weight: 600; }
+  .preview-spec {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--teal);
+  }
+  .preview-npi {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--muted);
+  }
+
+  .preview-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, var(--navy-3) 70%);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 20px;
+  }
+  .preview-overlay-text {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: .06em;
+  }
+
+  /* Plan mini cards */
+  .paywall-plans {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 28px;
+  }
+
+  .paywall-plan {
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 14px 10px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+    text-align: center; position: relative;
+  }
+  .paywall-plan:hover { border-color: var(--teal-bdr); }
+  .paywall-plan.selected { border-color: var(--teal); background: var(--teal-dim); }
+  .paywall-plan-badge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: var(--navy);
+    font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .paywall-plan-name {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--teal); text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: 4px;
+  }
+  .paywall-plan-price {
+    font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white);
+  }
+  .paywall-plan-price sup { font-size: 12px; vertical-align: super; }
+  .paywall-plan-mo {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted);
+  }
+
+  .paywall-cta {
+    width: 100%; padding: 15px; border: none; border-radius: 10px;
+    background: var(--teal); color: var(--navy);
+    font-family: 'Instrument Sans', sans-serif; font-size: 16px;
+    font-weight: 600; cursor: pointer; transition: opacity .2s;
+    margin-bottom: 14px;
+  }
+  .paywall-cta:hover { opacity: .88; }
+
+  .paywall-login-link {
+    font-size: 13px; color: var(--muted);
+  }
+  .paywall-login-link a {
+    color: var(--teal); text-decoration: none; cursor: pointer; font-weight: 600;
+  }
+
+  /* Perks list */
+  .perks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; text-align: left; }
+  .perk { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--white); }
+  .perk::before {
+    content: '→';
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--teal); flex-shrink: 0;
+  }
+
+  /* ── DASHBOARD ── */
+  .dashboard-page {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .dash-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    background: rgba(5,13,26,.92); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .dash-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .dash-logo-mark {
+    width: 30px; height: 30px; background: var(--teal); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 500; color: var(--navy);
+  }
+  .dash-logo-text {
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white);
+  }
+  .dash-logo-text span { color: var(--teal); }
+
+  .dash-nav-right { display: flex; align-items: center; gap: 16px; }
+
+  .dash-plan-badge {
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    border-radius: 100px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--teal);
+  }
+
+  .dash-user {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+  }
+  .dash-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--teal); display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--navy);
+  }
+  .dash-user-name { font-size: 14px; font-weight: 500; }
+
+  .dash-logout {
+    background: transparent; border: 1px solid var(--line); border-radius: 6px;
+    color: var(--muted); font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px; padding: 6px 14px; cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .dash-logout:hover { border-color: var(--red); color: var(--red); }
+
+  .dash-body { padding: 40px 48px; position: relative; z-index: 1; }
+
+  .dash-welcome {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; letter-spacing: -.7px; margin-bottom: 6px;
+  }
+  .dash-welcome em { font-style: italic; color: var(--teal); }
+
+  .dash-welcome-sub {
+    color: var(--muted); font-size: 15px; margin-bottom: 36px;
+  }
+
+  .dash-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 36px;
+  }
+
+  .dash-stat {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 22px 24px;
+    transition: border-color .2s;
+  }
+  .dash-stat:hover { border-color: var(--teal-bdr); }
+  .dash-stat-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+    margin-bottom: 10px;
+  }
+  .dash-stat-value {
+    font-family: 'DM Serif Display', serif; font-size: 32px;
+    letter-spacing: -1px; color: var(--white);
+  }
+  .dash-stat-value.teal { color: var(--teal); }
+  .dash-stat-change {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--teal); margin-top: 4px;
+  }
+
+  .dash-actions {
+    display: grid; grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+
+  .dash-card {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 28px;
+  }
+  .dash-card-title {
+    font-family: 'DM Serif Display', serif; font-size: 20px;
+    letter-spacing: -.4px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dash-card-title span {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--muted); font-weight: 400;
+  }
+
+  .quick-search { display: flex; flex-direction: column; gap: 12px; }
+
+  .qs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .qs-select, .qs-input {
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--white);
+    font-family: 'Instrument Sans', sans-serif; font-size: 13px;
+    padding: 10px 12px; outline: none; width: 100%;
+    transition: border-color .2s;
+  }
+  .qs-select:focus, .qs-input:focus { border-color: var(--teal-bdr); }
+  .qs-select option { background: var(--navy-2); }
+  .qs-input::placeholder { color: var(--muted); }
+
+  .qs-btn {
+    background: var(--teal); border: none; border-radius: 6px;
+    color: var(--navy); font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 600; padding: 12px;
+    cursor: pointer; transition: opacity .2s;
+  }
+  .qs-btn:hover { opacity: .85; }
+
+  /* Usage meter */
+  .usage-meter { display: flex; flex-direction: column; gap: 16px; }
+  .usage-row { display: flex; flex-direction: column; gap: 6px; }
+  .usage-top { display: flex; justify-content: space-between; align-items: center; }
+  .usage-label { font-size: 13px; color: var(--white); }
+  .usage-nums { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+  .usage-bar-bg {
+    height: 6px; background: var(--navy-3); border-radius: 3px; overflow: hidden;
+  }
+  .usage-bar-fill {
+    height: 100%; border-radius: 3px; background: var(--teal);
+    transition: width .8s ease;
+  }
+  .usage-bar-fill.warn { background: var(--gold); }
+
+  .upgrade-nudge {
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    border-radius: 8px; padding: 14px 16px; margin-top: 8px;
+  }
+  .upgrade-nudge-text { font-size: 13px; color: var(--white); margin-bottom: 10px; line-height: 1.5; }
+  .upgrade-nudge-text strong { color: var(--teal); }
+  .upgrade-nudge-btn {
+    width: 100%; padding: 9px; border: none; border-radius: 6px;
+    background: var(--teal); color: var(--navy);
+    font-family: 'Instrument Sans', sans-serif; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: opacity .2s;
+  }
+  .upgrade-nudge-btn:hover { opacity: .85; }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: var(--navy-3); border: 1px solid var(--teal-bdr);
+    border-radius: 10px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 500;
+    transform: translateY(80px); opacity: 0;
+    transition: transform .3s ease, opacity .3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { color: var(--teal); font-size: 18px; }
+
+  @media (max-width: 860px) {
+    .auth-left { display: none; }
+    .auth-right { padding: 32px 24px; }
+    .dash-stats { grid-template-columns: 1fr 1fr; }
+    .dash-actions { grid-template-columns: 1fr; }
+    .dash-body { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     PAGE 1 · PAYWALL GATE
+════════════════════════════════ -->
+<div class="page active" id="page-paywall">
+  <div class="paywall-page auth-page" style="flex-direction:column;align-items:center;justify-content:center;">
+    <div class="paywall-card">
+      <div class="paywall-lock">🔒</div>
+      <div class="paywall-eyebrow">Free preview limit reached</div>
+      <div class="paywall-title">You've seen <em>3 results.</em><br>Unlock the rest.</div>
+      <div class="paywall-sub">The NPI Registry has 1.2M+ verified physicians. You're one plan away from all of them.</div>
+
+      <!-- Blurred preview -->
+      <div class="paywall-preview">
+        <div class="preview-row">
+          <div class="preview-left">
+            <div class="preview-avatar">SP</div>
+            <div>
+              <div class="preview-name">Dr. Sarah Patel, MD</div>
+              <div class="preview-spec">Orthopedic Surgery</div>
+            </div>
+          </div>
+          <div class="preview-npi">NPI · 1234567890</div>
+        </div>
+        <div class="preview-row blurred">
+          <div class="preview-left">
+            <div class="preview-avatar">JO</div>
+            <div>
+              <div class="preview-name">Dr. James Okafor, MD</div>
+              <div class="preview-spec">Orthopedic Surgery</div>
+            </div>
+          </div>
+          <div class="preview-npi">NPI · ··········</div>
+        </div>
+        <div class="preview-row blurred">
+          <div class="preview-left">
+            <div class="preview-avatar">MR</div>
+            <div>
+              <div class="preview-name">Dr. Monica Reyes, DO</div>
+              <div class="preview-spec">Orthopedic Surgery</div>
+            </div>
+          </div>
+          <div class="preview-npi">NPI · ··········</div>
+        </div>
+        <div class="preview-overlay">
+          <div class="preview-overlay-text">147 more results locked · upgrade to view</div>
+        </div>
+      </div>
+
+      <!-- Plan picker -->
+      <div class="paywall-plans">
+        <div class="paywall-plan" data-plan="solo" onclick="selectPaywallPlan('solo',this)">
+          <div class="paywall-plan-name">Solo</div>
+          <div class="paywall-plan-price"><sup>$</sup>79</div>
+          <div class="paywall-plan-mo">/mo</div>
+        </div>
+        <div class="paywall-plan selected" data-plan="pro" onclick="selectPaywallPlan('pro',this)">
+          <div class="paywall-plan-badge">Popular</div>
+          <div class="paywall-plan-name">Pro</div>
+          <div class="paywall-plan-price"><sup>$</sup>179</div>
+          <div class="paywall-plan-mo">/mo</div>
+        </div>
+        <div class="paywall-plan" data-plan="team" onclick="selectPaywallPlan('team',this)">
+          <div class="paywall-plan-name">Team</div>
+          <div class="paywall-plan-price"><sup>$</sup>399</div>
+          <div class="paywall-plan-mo">/mo</div>
+        </div>
+      </div>
+
+      <div class="perks">
+        <div class="perk">Unlimited lead exports on Pro & Team</div>
+        <div class="perk">All 62 specialties + sub-specialties</div>
+        <div class="perk">CSV export + CRM integrations</div>
+        <div class="perk">14-day free trial, cancel anytime</div>
+      </div>
+
+      <button class="paywall-cta" onclick="showPage('page-signup')">Start 14-Day Free Trial →</button>
+      <div class="paywall-login-link">Already have an account? <a onclick="showPage('page-login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 2 · SIGN UP
+════════════════════════════════ -->
+<div class="page" id="page-signup">
+  <div class="auth-page">
+    <!-- Left -->
+    <div class="auth-left">
+      <div class="auth-left-glow"></div>
+      <a class="auth-logo" href="index.html">
+        <div class="auth-logo-mark">ML</div>
+        <span class="auth-logo-text">Med<span>Leads</span></span>
+      </a>
+      <div class="auth-left-title">Your territory.<br><em>Fully loaded.</em></div>
+      <div class="auth-left-sub">Join 340+ medical device reps who stopped losing deals to outdated lead lists.</div>
+      <div class="auth-left-stats">
+        <div class="stat-row">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-text">
+            <div class="stat-value">1.2M+</div>
+            <div class="stat-label">Verified NPI physicians</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-text">
+            <div class="stat-value">Daily</div>
+            <div class="stat-label">Data refresh from CMS</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-text">
+            <div class="stat-value">&lt; 60s</div>
+            <div class="stat-label">From search to CSV export</div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-left-testimonial" style="margin-top:40px">
+        <div class="testimonial-text">"I built my entire Q2 territory list in one afternoon. MedLeads paid for itself on the first closed deal."</div>
+        <div class="testimonial-byline">
+          <div class="testimonial-avatar">K</div>
+          <div>
+            <div class="testimonial-name">Kyle Bernstein</div>
+            <div class="testimonial-role">Territory Rep · Orthopedic Devices</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="auth-right">
+      <div class="auth-card">
+        <div class="auth-card-title">Create your account</div>
+        <div class="auth-card-sub">Already have one? <a onclick="showPage('page-login')">Sign in</a></div>
+
+        <!-- Plan selector -->
+        <div class="plan-selector">
+          <div class="plan-opt" onclick="selectPlan('solo',this)">
+            <div class="plan-opt-name">Solo</div>
+            <div class="plan-opt-price"><sup>$</sup>79</div>
+            <div class="plan-opt-period">/mo</div>
+          </div>
+          <div class="plan-opt selected" onclick="selectPlan('pro',this)">
+            <div class="plan-opt-badge">Popular</div>
+            <div class="plan-opt-name">Pro</div>
+            <div class="plan-opt-price"><sup>$</sup>179</div>
+            <div class="plan-opt-period">/mo</div>
+          </div>
+          <div class="plan-opt" onclick="selectPlan('team',this)">
+            <div class="plan-opt-name">Team</div>
+            <div class="plan-opt-price"><sup>$</sup>399</div>
+            <div class="plan-opt-period">/mo</div>
+          </div>
+        </div>
+
+        <div class="trial-notice">
+          <div class="trial-notice-icon">✓</div>
+          <div class="trial-notice-text"><strong>14-day free trial</strong> — no credit card required. Full access from day one.</div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-row">
+          <div class="field">
+            <div class="field-label">First name</div>
+            <input class="field-input" id="su-first" type="text" placeholder="Brandon">
+            <div class="field-error" id="err-first">Required</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Last name</div>
+            <input class="field-input" id="su-last" type="text" placeholder="Torres">
+            <div class="field-error" id="err-last">Required</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Work email</div>
+          <input class="field-input" id="su-email" type="email" placeholder="you@company.com">
+          <div class="field-error" id="err-email">Enter a valid email address</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Company / Territory</div>
+          <input class="field-input" id="su-company" type="text" placeholder="Stryker · Phoenix Southwest">
+        </div>
+
+        <div class="field">
+          <div class="field-label">Password</div>
+          <input class="field-input" id="su-pw" type="password" placeholder="Min. 8 characters" oninput="checkPwStrength(this.value)">
+          <div class="pw-strength">
+            <div class="pw-bar" id="pwb1"></div>
+            <div class="pw-bar" id="pwb2"></div>
+            <div class="pw-bar" id="pwb3"></div>
+            <div class="pw-bar" id="pwb4"></div>
+          </div>
+          <div class="field-error" id="err-pw">Min. 8 characters required</div>
+        </div>
+
+        <button class="submit-btn" id="signupBtn" onclick="handleSignup()">
+          Start Free Trial →
+        </button>
+
+        <div class="form-legal">
+          By signing up you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.<br>
+          No credit card required for trial.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 3 · LOGIN
+════════════════════════════════ -->
+<div class="page" id="page-login">
+  <div class="auth-page">
+    <!-- Left -->
+    <div class="auth-left">
+      <div class="auth-left-glow"></div>
+      <a class="auth-logo" href="index.html">
+        <div class="auth-logo-mark">ML</div>
+        <span class="auth-logo-text">Med<span>Leads</span></span>
+      </a>
+      <div class="auth-left-title">Good to have<br>you <em>back.</em></div>
+      <div class="auth-left-sub">Your leads are waiting. Sign back in and get to work.</div>
+      <div class="auth-left-stats">
+        <div class="stat-row">
+          <div class="stat-icon">📊</div>
+          <div class="stat-text">
+            <div class="stat-value">340+</div>
+            <div class="stat-label">Active reps on platform</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-icon">📁</div>
+          <div class="stat-text">
+            <div class="stat-value">12,400+</div>
+            <div class="stat-label">Leads exported this week</div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-left-testimonial" style="margin-top:40px">
+        <div class="testimonial-text">"My call-to-meeting rate went up 22% in the first month. NPI verification alone made that happen."</div>
+        <div class="testimonial-byline">
+          <div class="testimonial-avatar">D</div>
+          <div>
+            <div class="testimonial-name">Derek Osei</div>
+            <div class="testimonial-role">Account Executive · Neurology Devices</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="auth-right">
+      <div class="auth-card">
+        <div class="auth-card-title">Sign in</div>
+        <div class="auth-card-sub">No account yet? <a onclick="showPage('page-signup')">Start free trial</a></div>
+
+        <div style="height:24px"></div>
+
+        <div class="field">
+          <div class="field-label">Email</div>
+          <input class="field-input" id="li-email" type="email" placeholder="you@company.com">
+          <div class="field-error" id="err-li-email">Enter a valid email</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Password</div>
+          <input class="field-input" id="li-pw" type="password" placeholder="••••••••">
+          <div class="field-error" id="err-li-pw">Incorrect password</div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+          <a style="font-size:13px;color:var(--teal);text-decoration:none;cursor:pointer">Forgot password?</a>
+        </div>
+
+        <button class="submit-btn" id="loginBtn" onclick="handleLogin()">Sign In →</button>
+
+        <div class="form-divider" style="margin-top:24px">
+          <div class="form-divider-line"></div>
+          <div class="form-divider-text">or</div>
+          <div class="form-divider-line"></div>
+        </div>
+
+        <button class="submit-btn" style="background:var(--navy-3);color:var(--white);border:1px solid var(--line)" onclick="demoLogin()">
+          👁 Use demo account
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 4 · DASHBOARD
+════════════════════════════════ -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard-page">
+    <nav class="dash-nav">
+      <a class="dash-logo" onclick="void(0)">
+        <div class="dash-logo-mark">ML</div>
+        <span class="dash-logo-text">Med<span>Leads</span></span>
+      </a>
+      <div class="dash-nav-right">
+        <div class="dash-plan-badge" id="dashPlanBadge">Pro Plan</div>
+        <div class="dash-user">
+          <div class="dash-avatar" id="dashAvatar">B</div>
+          <div class="dash-user-name" id="dashUserName">Brandon</div>
+        </div>
+        <button class="dash-logout" onclick="handleLogout()">Sign out</button>
+      </div>
+    </nav>
+
+    <div class="dash-body">
+      <div class="dash-welcome">Welcome back, <em id="dashFirstName">Brandon</em>.</div>
+      <div class="dash-welcome-sub">Here's your account overview. Jump into a search or pick up where you left off.</div>
+
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <div class="dash-stat-label">Exports This Month</div>
+          <div class="dash-stat-value teal" id="statExports">0</div>
+          <div class="dash-stat-change">↑ ready to use</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Plan Limit</div>
+          <div class="dash-stat-value" id="statLimit">500</div>
+          <div class="dash-stat-change">leads / month</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Searches Run</div>
+          <div class="dash-stat-value">0</div>
+          <div class="dash-stat-change">this session</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Days in Trial</div>
+          <div class="dash-stat-value teal">14</div>
+          <div class="dash-stat-change">remaining</div>
+        </div>
+      </div>
+
+      <div class="dash-actions">
+        <!-- Quick search -->
+        <div class="dash-card">
+          <div class="dash-card-title">Quick Search <span>Powered by NPI Registry</span></div>
+          <div class="quick-search">
+            <div class="qs-row">
+              <select class="qs-select" id="qsSpecialty">
+                <option value="">All Specialties</option>
+                <option value="207X00000X">Orthopedic Surgery</option>
+                <option value="207RC0000X">Cardiology</option>
+                <option value="2084N0400X">Neurology</option>
+                <option value="207RG0100X">General Surgery</option>
+                <option value="207P00000X">Emergency Medicine</option>
+                <option value="207L00000X">Anesthesiology</option>
+                <option value="2085R0202X">Diagnostic Radiology</option>
+              </select>
+              <input class="qs-input" id="qsCity" type="text" placeholder="City or state…">
+            </div>
+            <button class="qs-btn" onclick="launchSearch()">Search Physicians →</button>
+          </div>
+        </div>
+
+        <!-- Usage -->
+        <div class="dash-card">
+          <div class="dash-card-title">Usage</div>
+          <div class="usage-meter">
+            <div class="usage-row">
+              <div class="usage-top">
+                <div class="usage-label">Exports used</div>
+                <div class="usage-nums" id="usageNums">0 / 500</div>
+              </div>
+              <div class="usage-bar-bg">
+                <div class="usage-bar-fill" id="usageBar" style="width:1%"></div>
+              </div>
+            </div>
+            <div class="upgrade-nudge">
+              <div class="upgrade-nudge-text">Upgrade to <strong>Pro</strong> for unlimited exports and CRM sync.</div>
+              <button class="upgrade-nudge-btn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+// ── STATE ──
+let currentUser = null;
+let selectedPlan = 'pro';
+let selectedPaywallPlan = 'pro';
+
+// Simulated user DB (in production: real backend)
+const users = {};
+
+// ── PAGE ROUTER ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── PLAN SELECTION ──
+function selectPlan(plan, el) {
+  selectedPlan = plan;
+  document.querySelectorAll('#page-signup .plan-opt').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectPaywallPlan(plan, el) {
+  selectedPaywallPlan = plan;
+  document.querySelectorAll('.paywall-plan').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── PASSWORD STRENGTH ──
+function checkPwStrength(pw) {
+  const bars = ['pwb1','pwb2','pwb3','pwb4'];
+  bars.forEach(id => {
+    document.getElementById(id).className = 'pw-bar';
+  });
+
+  let strength = 0;
+  if (pw.length >= 8)  strength++;
+  if (/[A-Z]/.test(pw)) strength++;
+  if (/[0-9]/.test(pw)) strength++;
+  if (/[^A-Za-z0-9]/.test(pw)) strength++;
+
+  const cls = strength <= 1 ? 'weak' : strength <= 2 ? 'medium' : 'strong';
+  for (let i = 0; i < strength; i++) {
+    document.getElementById(bars[i]).classList.add(cls);
+  }
+}
+
+// ── VALIDATION ──
+function validate(id, errId, condition) {
+  const input = document.getElementById(id);
+  const err   = document.getElementById(errId);
+  if (!condition(input.value)) {
+    input.classList.add('error');
+    err.classList.add('show');
+    return false;
+  }
+  input.classList.remove('error');
+  err.classList.remove('show');
+  return true;
+}
+
+// ── SIGNUP ──
+function handleSignup() {
+  const firstName = document.getElementById('su-first').value.trim();
+  const lastName  = document.getElementById('su-last').value.trim();
+  const email     = document.getElementById('su-email').value.trim();
+  const pw        = document.getElementById('su-pw').value;
+
+  let valid = true;
+  valid = validate('su-first', 'err-first', v => v.length > 0) && valid;
+  valid = validate('su-last',  'err-last',  v => v.length > 0) && valid;
+  valid = validate('su-email', 'err-email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) && valid;
+  valid = validate('su-pw',    'err-pw',    v => v.length >= 8) && valid;
+
+  if (!valid) return;
+
+  // Simulate loading
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.classList.add('loading');
+  btn.textContent = 'Creating account…';
+
+  setTimeout(() => {
+    // Store user
+    users[email] = { firstName, lastName, email, pw, plan: selectedPlan };
+    currentUser = users[email];
+
+    btn.disabled = false; btn.classList.remove('loading');
+    btn.textContent = 'Start Free Trial →';
+
+    loadDashboard();
+    showPage('page-dashboard');
+    showToast(`Welcome to MedLeads, ${firstName}! 🎉`);
+  }, 1600);
+}
+
+// ── LOGIN ──
+function handleLogin() {
+  const email = document.getElementById('li-email').value.trim();
+  const pw    = document.getElementById('li-pw').value;
+
+  let valid = true;
+  valid = validate('li-email', 'err-li-email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) && valid;
+  valid = validate('li-pw', 'err-li-pw', v => v.length >= 1) && valid;
+  if (!valid) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.classList.add('loading');
+  btn.textContent = 'Signing in…';
+
+  setTimeout(() => {
+    btn.disabled = false; btn.classList.remove('loading');
+    btn.textContent = 'Sign In →';
+
+    const user = users[email];
+    if (user && user.pw === pw) {
+      currentUser = user;
+      loadDashboard();
+      showPage('page-dashboard');
+      showToast(`Welcome back, ${user.firstName}!`);
+    } else {
+      // Wrong creds — show error
+      const errEl = document.getElementById('err-li-pw');
+      document.getElementById('li-pw').classList.add('error');
+      errEl.textContent = 'Incorrect email or password';
+      errEl.classList.add('show');
+    }
+  }, 1200);
+}
+
+function demoLogin() {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+
+  setTimeout(() => {
+    currentUser = { firstName: 'Brandon', lastName: 'T', email: 'demo@medleads.io', plan: 'pro' };
+    loadDashboard();
+    showPage('page-dashboard');
+    showToast('Signed in as demo account');
+    btn.disabled = false;
+  }, 900);
+}
+
+// ── DASHBOARD ──
+function loadDashboard() {
+  if (!currentUser) return;
+
+  const planLimits = { solo: 500, pro: 'Unlimited', team: 'Unlimited' };
+  const planLabels = { solo: 'Solo Plan', pro: 'Pro Plan', team: 'Team Plan' };
+
+  document.getElementById('dashFirstName').textContent = currentUser.firstName;
+  document.getElementById('dashUserName').textContent  = currentUser.firstName + ' ' + (currentUser.lastName || '');
+  document.getElementById('dashAvatar').textContent    = currentUser.firstName.charAt(0).toUpperCase();
+  document.getElementById('dashPlanBadge').textContent = planLabels[currentUser.plan] || 'Pro Plan';
+
+  const limit = planLimits[currentUser.plan] || 500;
+  document.getElementById('statLimit').textContent = limit;
+  document.getElementById('usageNums').textContent = `0 / ${limit}`;
+}
+
+function handleLogout() {
+  currentUser = null;
+  showPage('page-paywall');
+  showToast('Signed out successfully');
+}
+
+function launchSearch() {
+  const spec = document.getElementById('qsSpecialty').value;
+  const city = document.getElementById('qsCity').value.trim();
+
+  if (!spec && !city) {
+    showToast('Enter a specialty or city to search');
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (spec) params.set('specialty', spec);
+  if (city) params.set('city', city);
+
+  // In production: navigate to search page with params
+  // For demo: open the search file
+  window.open(`https://bburrell5000.github.io/medleads/medleads-search.html?${params.toString()}`, '_blank');
+  showToast('Opening search results…');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
