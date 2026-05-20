@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedLeads — Search Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:     #0B1F3B;
+    --navy-2:   #0D2645;
+    --navy-3:   #0F4C81;
+    --navy-4:   #1a3a6b;
+    --teal:     #D4AF37;
+    --teal-dim: rgba(212,175,55,0.12);
+    --teal-bdr: rgba(212,175,55,0.35);
+    --white:    #F3EFE6;
+    --muted:    #7a9ab8;
+    --line:     #1a3356;
+    --red:      #ff4d6d;
+    --gold:     #f5a623;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* noise */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 32px;
+    background: rgba(5,13,26,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 9px;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 30px; height: 30px;
+    background: var(--teal); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 500; color: var(--navy);
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: var(--white);
+  }
+  .logo-text span { color: var(--teal); }
+
+  /* search bar in nav */
+  .nav-search {
+    flex: 1; display: flex; gap: 0;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--navy-2); overflow: hidden;
+    max-width: 680px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .nav-search:focus-within {
+    border-color: var(--teal-bdr);
+    box-shadow: 0 0 0 3px var(--teal-dim);
+  }
+
+  .nav-select {
+    background: var(--navy-3); border: none;
+    border-right: 1px solid var(--line);
+    color: var(--white); font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; padding: 0 12px; cursor: pointer;
+    outline: none; min-width: 160px;
+  }
+  .nav-select option { background: var(--navy-2); }
+
+  .nav-input {
+    flex: 1; background: transparent; border: none;
+    color: var(--white); font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; padding: 11px 16px; outline: none;
+  }
+  .nav-input::placeholder { color: var(--muted); }
+
+  .nav-btn {
+    background: var(--teal); border: none;
+    color: var(--navy); font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 0 22px; cursor: pointer;
+    transition: opacity .2s; white-space: nowrap;
+  }
+  .nav-btn:hover { opacity: .85; }
+
+  /* ── LAYOUT ── */
+  .app {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 57px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    border-right: 1px solid var(--line);
+    padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 28px;
+    background: var(--navy-2);
+    position: sticky; top: 57px;
+    height: calc(100vh - 57px);
+    overflow-y: auto;
+  }
+
+  .filter-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .filter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--teal);
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+
+  .filter-select, .filter-input {
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; padding: 9px 12px; outline: none;
+    width: 100%; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: var(--teal-bdr); }
+  .filter-select option { background: var(--navy-2); }
+  .filter-input::placeholder { color: var(--muted); }
+
+  .filter-divider { border: none; border-top: 1px solid var(--line); }
+
+  .filter-apply {
+    background: var(--teal); border: none; border-radius: 6px;
+    color: var(--navy); font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 600; padding: 11px;
+    cursor: pointer; transition: opacity .2s; width: 100%;
+  }
+  .filter-apply:hover { opacity: .85; }
+
+  .filter-reset {
+    background: transparent; border: 1px solid var(--line); border-radius: 6px;
+    color: var(--muted); font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; padding: 9px;
+    cursor: pointer; transition: border-color .2s, color .2s; width: 100%;
+  }
+  .filter-reset:hover { border-color: var(--teal-bdr); color: var(--white); }
+
+  .results-count-sidebar {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    padding: 10px 12px;
+    background: var(--navy-3); border-radius: 6px;
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .results-count-sidebar strong { color: var(--teal); }
+
+  /* ── MAIN ── */
+  .main { padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* results header */
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .results-meta { display: flex; flex-direction: column; gap: 4px; }
+
+  .results-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px; letter-spacing: -.5px;
+  }
+
+  .results-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--muted);
+  }
+  .results-sub strong { color: var(--teal); }
+
+  .export-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--navy-3); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--white); font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 9px 18px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .export-btn:hover { border-color: var(--teal-bdr); background: var(--navy-4); }
+  .export-btn svg { color: var(--teal); }
+
+  /* active filters pills */
+  .active-filters {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+
+  .filter-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    border-radius: 100px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--teal);
+  }
+  .pill-remove {
+    cursor: pointer; opacity: .6; transition: opacity .15s;
+    font-size: 14px; line-height: 1;
+  }
+  .pill-remove:hover { opacity: 1; }
+
+  /* ── SKELETON ── */
+  .skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+  .skeleton-card {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 24px;
+    animation: skeletonPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes skeletonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .45; }
+  }
+  .sk-line {
+    background: var(--line); border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  /* ── RESULT CARDS ── */
+  .results-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .result-card {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 22px 24px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 16px; align-items: start;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    animation: cardIn .35s ease both;
+  }
+  .result-card:hover {
+    border-color: var(--teal-bdr);
+    background: var(--navy-3);
+    transform: translateX(3px);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-left { display: flex; flex-direction: column; gap: 10px; }
+
+  .card-top { display: flex; align-items: flex-start; gap: 14px; }
+
+  .card-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--teal);
+    flex-shrink: 0;
+  }
+
+  .card-name-block { display: flex; flex-direction: column; gap: 3px; }
+
+  .card-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; letter-spacing: -.3px;
+  }
+
+  .card-specialty {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--teal);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+
+  .card-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+
+  .badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .badge-verified {
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr); color: var(--teal);
+  }
+  .badge-type {
+    background: rgba(245,166,35,.1); border: 1px solid rgba(245,166,35,.3); color: var(--gold);
+  }
+  .badge-gender {
+    background: var(--navy-3); border: 1px solid var(--line); color: var(--muted);
+  }
+
+  .card-meta {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-top: 4px;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 3px; }
+
+  .meta-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+
+  .meta-value {
+    font-size: 13px; color: var(--white); font-weight: 500;
+  }
+  .meta-value.mono {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+
+  /* card right */
+  .card-right {
+    display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+  }
+
+  .card-npi {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 4px; padding: 4px 10px;
+  }
+
+  .card-action {
+    background: transparent; border: 1px solid var(--teal-bdr); border-radius: 6px;
+    color: var(--teal); font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    padding: 7px 14px; cursor: pointer;
+    transition: background .2s, color .2s;
+    white-space: nowrap;
+  }
+  .card-action:hover { background: var(--teal); color: var(--navy); }
+
+  /* detail drawer */
+  .detail-drawer {
+    background: var(--navy-3); border: 1px solid var(--teal-bdr);
+    border-radius: 10px; padding: 20px 24px;
+    margin-top: 4px; display: none;
+    animation: drawerIn .2s ease;
+  }
+  .detail-drawer.open { display: block; }
+
+  @keyframes drawerIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .drawer-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .drawer-item { display: flex; flex-direction: column; gap: 4px; }
+  .drawer-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+  .drawer-value { font-size: 13px; color: var(--white); }
+
+  /* ── EMPTY / ERROR states ── */
+  .state-box {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 16px;
+    padding: 80px 24px; text-align: center;
+  }
+  .state-icon { font-size: 48px; opacity: .6; }
+  .state-title {
+    font-family: 'DM Serif Display', serif; font-size: 26px;
+  }
+  .state-sub { color: var(--muted); font-size: 15px; max-width: 380px; line-height: 1.6; }
+
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 16px 0 8px;
+  }
+  .page-btn {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--white);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    padding: 8px 16px; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--teal-bdr); }
+  .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .page-info {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+    padding: 0 8px;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(5,13,26,.82);
+    backdrop-filter: blur(6px); z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; display: none;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--navy-2); border: 1px solid var(--teal-bdr);
+    border-radius: 14px; padding: 36px;
+    max-width: 520px; width: 100%;
+    animation: modalIn .25s ease;
+    position: relative;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.95) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--navy-3); border: 1px solid var(--line);
+    border-radius: 6px; color: var(--muted);
+    font-size: 18px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: color .2s;
+  }
+  .modal-close:hover { color: var(--white); }
+  .modal-title {
+    font-family: 'DM Serif Display', serif; font-size: 26px;
+    letter-spacing: -.5px; margin-bottom: 6px;
+  }
+  .modal-spec {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--teal); text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 24px;
+  }
+  .modal-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 28px;
+  }
+  .modal-item { display: flex; flex-direction: column; gap: 4px; }
+  .modal-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+  }
+  .modal-value { font-size: 14px; color: var(--white); font-weight: 500; }
+  .modal-value.mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .modal-divider { border: none; border-top: 1px solid var(--line); margin-bottom: 24px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1; padding: 12px; border-radius: 8px; font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
+    transition: opacity .2s; border: none;
+  }
+  .modal-btn-primary { background: var(--teal); color: var(--navy); }
+  .modal-btn-primary:hover { opacity: .85; }
+  .modal-btn-secondary {
+    background: var(--navy-3); border: 1px solid var(--line); color: var(--white);
+  }
+  .modal-btn-secondary:hover { border-color: var(--teal-bdr); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: var(--navy-3); border: 1px solid var(--teal-bdr);
+    border-radius: 10px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 500;
+    transform: translateY(80px); opacity: 0;
+    transition: transform .3s ease, opacity .3s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { color: var(--teal); font-size: 18px; }
+
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; }
+    .card-meta { grid-template-columns: 1fr 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="medleads.html" class="logo">
+    <div class="logo-mark">ML</div>
+    <span class="logo-text">Med<span>Leads</span></span>
+  </a>
+  <div class="nav-search">
+    <select class="nav-select" id="navSpecialty">
+      <option value="">All Specialties</option>
+      <option value="207X00000X">Orthopedic Surgery</option>
+      <option value="207RC0000X">Cardiology</option>
+      <option value="2084N0400X">Neurology</option>
+      <option value="207RG0100X">General Surgery</option>
+      <option value="2086S0122X">Surgical Oncology</option>
+      <option value="207V00000X">Obstetrics & Gynecology</option>
+      <option value="207P00000X">Emergency Medicine</option>
+      <option value="207L00000X">Anesthesiology</option>
+      <option value="2085R0202X">Diagnostic Radiology</option>
+      <option value="207RN0300X">Nephrology</option>
+      <option value="207RG0300X">Gastroenterology</option>
+      <option value="207RP1001X">Pulmonary Disease</option>
+    </select>
+    <input class="nav-input" id="navCity" type="text" placeholder="City or state…">
+    <button class="nav-btn" id="navSearchBtn">Search →</button>
+  </div>
+</nav>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="filter-group">
+      <div class="filter-label">Provider Type</div>
+      <select class="filter-select" id="filterType">
+        <option value="1">Individual (MD / DO)</option>
+        <option value="2">Organization / Group</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">State</div>
+      <select class="filter-select" id="filterState">
+        <option value="">Any state</option>
+        <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+        <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+        <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+        <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+        <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+        <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+        <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+        <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+        <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+        <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+        <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+        <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+        <option>WI</option><option>WY</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Last Name Filter</div>
+      <input class="filter-input" id="filterLastName" type="text" placeholder="e.g. Smith">
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Gender</div>
+      <select class="filter-select" id="filterGender">
+        <option value="">Any</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Results per page</div>
+      <select class="filter-select" id="filterLimit">
+        <option value="10">10</option>
+        <option value="20" selected>20</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+
+    <hr class="filter-divider">
+
+    <button class="filter-apply" id="applyFilters">Apply Filters</button>
+    <button class="filter-reset" id="resetFilters">Reset</button>
+
+    <div class="results-count-sidebar" id="sidebarCount">
+      Enter a search to find leads
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="results-header">
+      <div class="results-meta">
+        <div class="results-title" id="resultsTitle">Search for Physicians</div>
+        <div class="results-sub" id="resultsSub">Use the search bar or filters to find verified providers</div>
+      </div>
+      <button class="export-btn" id="exportBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export CSV
+      </button>
+    </div>
+
+    <div class="active-filters" id="activePills"></div>
+
+    <div id="resultsContainer">
+      <div class="state-box">
+        <div class="state-icon">🔬</div>
+        <div class="state-title">Ready to find leads</div>
+        <div class="state-sub">Search by specialty and location above, or apply sidebar filters to pull verified NPI physician records.</div>
+      </div>
+    </div>
+
+    <div class="pagination" id="paginationBar" style="display:none">
+      <button class="page-btn" id="prevBtn">← Prev</button>
+      <span class="page-info" id="pageInfo"></span>
+      <button class="page-btn" id="nextBtn">Next →</button>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" id="modalClose">×</button>
+    <div class="modal-title" id="modalName"></div>
+    <div class="modal-spec" id="modalSpec"></div>
+    <div class="modal-grid" id="modalGrid"></div>
+    <hr class="modal-divider">
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" id="modalAddLead">+ Add to Lead List</button>
+      <button class="modal-btn modal-btn-secondary" id="modalCopyNPI">Copy NPI</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+// ── STATE ──
+let currentResults = [];
+let currentPage = 1;
+let currentSkip = 0;
+let currentParams = {};
+let activeModal = null;
+let leadList = [];
+
+const SPECIALTY_NAMES = {
+  '207X00000X': 'Orthopedic Surgery',
+  '207RC0000X': 'Cardiology',
+  '2084N0400X': 'Neurology',
+  '207RG0100X': 'General Surgery',
+  '2086S0122X': 'Surgical Oncology',
+  '207V00000X': 'Obstetrics & Gynecology',
+  '207P00000X': 'Emergency Medicine',
+  '207L00000X': 'Anesthesiology',
+  '2085R0202X': 'Diagnostic Radiology',
+  '207RN0300X': 'Nephrology',
+  '207RG0300X': 'Gastroenterology',
+  '207RP1001X': 'Pulmonary Disease',
+};
+
+// ── NPI API ──
+async function fetchNPI(params) {
+  const base = 'https://npiregistry.cms.hhs.gov/api/?version=2.1&';
+  const qs = Object.entries(params)
+    .filter(([_, v]) => v !== '' && v !== undefined)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+  const url = base + qs;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('API error: ' + res.status);
+  return res.json();
+}
+
+function buildParams() {
+  const p = {
+    enumeration_type: document.getElementById('filterType').value || '1',
+    limit: document.getElementById('filterLimit').value || '20',
+    skip: currentSkip,
+  };
+
+  const spec = document.getElementById('navSpecialty').value;
+  const city = document.getElementById('navCity').value.trim();
+  const state = document.getElementById('filterState').value;
+  const lastName = document.getElementById('filterLastName').value.trim();
+  const gender = document.getElementById('filterGender').value;
+
+  if (spec)     p.taxonomy_description = spec;
+  if (city)     p.city = city;
+  if (state)    p.state = state;
+  if (lastName) p.last_name = lastName;
+  if (gender)   p.gender = gender;
+
+  return p;
+}
+
+// ── SEARCH ──
+async function doSearch(resetPage = true) {
+  if (resetPage) { currentSkip = 0; currentPage = 1; }
+
+  currentParams = buildParams();
+
+  // Need at least one real filter
+  const hasFilter = Object.keys(currentParams).some(k =>
+    !['enumeration_type','limit','skip'].includes(k) && currentParams[k]
+  );
+
+  if (!hasFilter) {
+    showState('🔬', 'Add a filter to search', 'Select a specialty, city, state, or last name to pull physician records from the NPI Registry.');
+    return;
+  }
+
+  showLoading();
+  updatePills();
+
+  try {
+    const data = await fetchNPI(currentParams);
+    const results = data.results || [];
+    currentResults = results;
+    renderResults(results, data.result_count || results.length);
+  } catch (e) {
+    showState('⚠️', 'Search failed', 'Could not reach the NPI Registry. Check your connection and try again. Error: ' + e.message);
+  }
+}
+
+// ── RENDER ──
+function renderResults(results, total) {
+  const container = document.getElementById('resultsContainer');
+  const limit = parseInt(document.getElementById('filterLimit').value) || 20;
+
+  // header
+  const specName = SPECIALTY_NAMES[document.getElementById('navSpecialty').value] || 'All Specialties';
+  const city = document.getElementById('navCity').value.trim();
+  const state = document.getElementById('filterState').value;
+  const loc = [city, state].filter(Boolean).join(', ') || 'All Locations';
+
+  document.getElementById('resultsTitle').textContent =
+    `${specName} · ${loc}`;
+  document.getElementById('resultsSub').innerHTML =
+    `Showing <strong>${results.length}</strong> of <strong>${total.toLocaleString()}</strong> verified providers · NPI Registry`;
+  document.getElementById('sidebarCount').innerHTML =
+    `<strong>${total.toLocaleString()}</strong> total results`;
+
+  if (!results.length) {
+    showState('🔍', 'No results found', 'Try broadening your search — remove a filter or try a different specialty or location.');
+    document.getElementById('paginationBar').style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = '';
+  const list = document.createElement('div');
+  list.className = 'results-list';
+
+  results.forEach((r, i) => {
+    const card = buildCard(r, i);
+    list.appendChild(card);
+  });
+
+  container.appendChild(list);
+
+  // pagination
+  const bar = document.getElementById('paginationBar');
+  bar.style.display = 'flex';
+  document.getElementById('pageInfo').textContent = `Page ${currentPage}`;
+  document.getElementById('prevBtn').disabled = currentPage <= 1;
+  document.getElementById('nextBtn').disabled = results.length < limit;
+}
+
+function buildCard(r, idx) {
+  const basic = r.basic || {};
+  const addresses = r.addresses || [];
+  const taxonomies = r.taxonomies || [];
+
+  // Name
+  const isOrg = r.enumeration_type === 'NPI-2';
+  let name, initials;
+  if (isOrg) {
+    name = basic.organization_name || 'Organization';
+    initials = name.charAt(0);
+  } else {
+    const prefix = basic.name_prefix || '';
+    const first = basic.first_name || '';
+    const last = basic.last_name || '';
+    const cred = basic.credential ? ', ' + basic.credential : '';
+    name = [prefix, first, last].filter(Boolean).join(' ') + cred;
+    initials = (first.charAt(0) || '') + (last.charAt(0) || '');
+  }
+
+  // Specialty
+  const primaryTax = taxonomies.find(t => t.primary) || taxonomies[0] || {};
+  const specialty = primaryTax.desc || 'Provider';
+
+  // Address
+  const pracAddr = addresses.find(a => a.address_purpose === 'LOCATION') || addresses[0] || {};
+  const addrLine = [pracAddr.address_1, pracAddr.city, pracAddr.state, pracAddr.postal_code]
+    .filter(Boolean).join(', ');
+  const phone = pracAddr.telephone_number || '—';
+
+  // Gender
+  const gender = basic.gender === 'M' ? 'Male' : basic.gender === 'F' ? 'Female' : '';
+  const entityType = isOrg ? 'Organization' : 'Individual';
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.style.animationDelay = (idx * 35) + 'ms';
+
+  card.innerHTML = `
+    <div class="card-left">
+      <div class="card-top">
+        <div class="card-avatar">${initials || '?'}</div>
+        <div class="card-name-block">
+          <div class="card-name">${escHtml(name)}</div>
+          <div class="card-specialty">${escHtml(specialty)}</div>
+          <div class="card-badges">
+            <span class="badge badge-verified">✓ NPI Verified</span>
+            <span class="badge badge-type">${entityType}</span>
+            ${gender ? `<span class="badge badge-gender">${gender}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-label">Address</div>
+          <div class="meta-value" style="font-size:12px">${escHtml(addrLine || '—')}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Phone</div>
+          <div class="meta-value">${escHtml(phone)}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">NPI Number</div>
+          <div class="meta-value mono">${r.number || '—'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-right">
+      <div class="card-npi">NPI · ${r.number || '—'}</div>
+      <button class="card-action" data-idx="${idx}">View Details</button>
+    </div>
+  `;
+
+  card.querySelector('.card-action').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openModal(r);
+  });
+
+  card.addEventListener('click', () => openModal(r));
+
+  return card;
+}
+
+// ── MODAL ──
+function openModal(r) {
+  activeModal = r;
+  const basic = r.basic || {};
+  const addresses = r.addresses || [];
+  const taxonomies = r.taxonomies || [];
+  const isOrg = r.enumeration_type === 'NPI-2';
+
+  let name;
+  if (isOrg) {
+    name = basic.organization_name || 'Organization';
+  } else {
+    name = [basic.name_prefix, basic.first_name, basic.middle_name, basic.last_name]
+      .filter(Boolean).join(' ');
+    if (basic.credential) name += ', ' + basic.credential;
+  }
+
+  const primaryTax = taxonomies.find(t => t.primary) || taxonomies[0] || {};
+  const specialty = primaryTax.desc || 'Provider';
+  const pracAddr = addresses.find(a => a.address_purpose === 'LOCATION') || addresses[0] || {};
+  const mailAddr = addresses.find(a => a.address_purpose === 'MAILING') || {};
+  const phone = pracAddr.telephone_number || '—';
+  const fax = pracAddr.fax_number || '—';
+
+  document.getElementById('modalName').textContent = name;
+  document.getElementById('modalSpec').textContent = specialty;
+
+  const allTax = taxonomies.map(t => t.desc).filter(Boolean).join(', ');
+  const enrollDate = basic.enumeration_date || '—';
+  const updateDate = basic.last_updated || '—';
+  const status = basic.status === 'A' ? '✓ Active' : (basic.status || '—');
+  const licenseState = primaryTax.license ? `${primaryTax.state || ''} — ${primaryTax.license}` : '—';
+
+  document.getElementById('modalGrid').innerHTML = `
+    <div class="modal-item"><div class="modal-label">NPI Number</div><div class="modal-value mono">${r.number || '—'}</div></div>
+    <div class="modal-item"><div class="modal-label">Status</div><div class="modal-value" style="color:var(--teal)">${status}</div></div>
+    <div class="modal-item"><div class="modal-label">Phone</div><div class="modal-value">${escHtml(phone)}</div></div>
+    <div class="modal-item"><div class="modal-label">Fax</div><div class="modal-value">${escHtml(fax)}</div></div>
+    <div class="modal-item modal-item--wide" style="grid-column:1/-1"><div class="modal-label">Practice Address</div><div class="modal-value">${escHtml([pracAddr.address_1, pracAddr.address_2, pracAddr.city, pracAddr.state, pracAddr.postal_code].filter(Boolean).join(', ') || '—')}</div></div>
+    <div class="modal-item modal-item--wide" style="grid-column:1/-1"><div class="modal-label">All Specialties / Taxonomies</div><div class="modal-value" style="font-size:13px">${escHtml(allTax || '—')}</div></div>
+    <div class="modal-item"><div class="modal-label">License</div><div class="modal-value mono" style="font-size:12px">${escHtml(licenseState)}</div></div>
+    <div class="modal-item"><div class="modal-label">Enrolled</div><div class="modal-value mono" style="font-size:12px">${enrollDate}</div></div>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modalOverlay').classList.remove('open');
+});
+
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+});
+
+document.getElementById('modalAddLead').addEventListener('click', () => {
+  if (activeModal) {
+    leadList.push(activeModal);
+    showToast(`Lead added! (${leadList.length} total in list)`);
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+});
+
+document.getElementById('modalCopyNPI').addEventListener('click', () => {
+  if (activeModal) {
+    navigator.clipboard.writeText(activeModal.number || '').catch(() => {});
+    showToast('NPI number copied to clipboard');
+  }
+});
+
+// ── EXPORT CSV ──
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!currentResults.length) { showToast('No results to export yet'); return; }
+
+  const rows = [['Name','NPI','Specialty','Phone','Address','State','Enrolled']];
+  currentResults.forEach(r => {
+    const basic = r.basic || {};
+    const isOrg = r.enumeration_type === 'NPI-2';
+    const name = isOrg
+      ? (basic.organization_name || '')
+      : [basic.first_name, basic.last_name, basic.credential].filter(Boolean).join(' ');
+    const tax = (r.taxonomies || []).find(t => t.primary) || (r.taxonomies || [])[0] || {};
+    const addr = (r.addresses || []).find(a => a.address_purpose === 'LOCATION') || {};
+    const addrStr = [addr.address_1, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ');
+    rows.push([
+      name, r.number || '', tax.desc || '',
+      addr.telephone_number || '', addrStr, addr.state || '',
+      basic.enumeration_date || ''
+    ]);
+  });
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'medleads-export.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${currentResults.length} records as CSV`);
+});
+
+// ── PAGINATION ──
+document.getElementById('prevBtn').addEventListener('click', () => {
+  const limit = parseInt(document.getElementById('filterLimit').value) || 20;
+  if (currentSkip >= limit) {
+    currentSkip -= limit; currentPage--;
+    doSearch(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  const limit = parseInt(document.getElementById('filterLimit').value) || 20;
+  currentSkip += limit; currentPage++;
+  doSearch(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── PILLS ──
+function updatePills() {
+  const container = document.getElementById('activePills');
+  container.innerHTML = '';
+
+  const spec = document.getElementById('navSpecialty');
+  const city = document.getElementById('navCity').value.trim();
+  const state = document.getElementById('filterState').value;
+  const ln = document.getElementById('filterLastName').value.trim();
+  const gender = document.getElementById('filterGender').value;
+
+  if (spec.value) addPill(container, SPECIALTY_NAMES[spec.value] || spec.value, () => { spec.value = ''; doSearch(); });
+  if (city)  addPill(container, city, () => { document.getElementById('navCity').value = ''; doSearch(); });
+  if (state) addPill(container, state, () => { document.getElementById('filterState').value = ''; doSearch(); });
+  if (ln)    addPill(container, 'Last: ' + ln, () => { document.getElementById('filterLastName').value = ''; doSearch(); });
+  if (gender) addPill(container, gender === 'M' ? 'Male' : 'Female', () => { document.getElementById('filterGender').value = ''; doSearch(); });
+}
+
+function addPill(container, text, onRemove) {
+  const pill = document.createElement('div');
+  pill.className = 'filter-pill';
+  pill.innerHTML = `${escHtml(text)} <span class="pill-remove" title="Remove">×</span>`;
+  pill.querySelector('.pill-remove').addEventListener('click', onRemove);
+  container.appendChild(pill);
+}
+
+// ── STATES ──
+function showLoading() {
+  const container = document.getElementById('resultsContainer');
+  document.getElementById('paginationBar').style.display = 'none';
+  document.getElementById('sidebarCount').innerHTML = 'Searching…';
+
+  let html = '<div class="skeleton-list">';
+  for (let i = 0; i < 5; i++) {
+    html += `<div class="skeleton-card">
+      <div class="sk-line" style="height:18px;width:${180 + (i%3)*40}px"></div>
+      <div class="sk-line" style="height:12px;width:120px"></div>
+      <div class="sk-line" style="height:12px;width:220px;margin-top:16px"></div>
+    </div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showState(icon, title, sub) {
+  document.getElementById('resultsContainer').innerHTML = `
+    <div class="state-box">
+      <div class="state-icon">${icon}</div>
+      <div class="state-title">${title}</div>
+      <div class="state-sub">${sub}</div>
+    </div>`;
+  document.getElementById('sidebarCount').textContent = 'No results';
+  document.getElementById('paginationBar').style.display = 'none';
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── EVENTS ──
+document.getElementById('navSearchBtn').addEventListener('click', () => doSearch());
+document.getElementById('navCity').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+document.getElementById('applyFilters').addEventListener('click', () => doSearch());
+
+document.getElementById('resetFilters').addEventListener('click', () => {
+  document.getElementById('navSpecialty').value = '';
+  document.getElementById('navCity').value = '';
+  document.getElementById('filterState').value = '';
+  document.getElementById('filterLastName').value = '';
+  document.getElementById('filterGender').value = '';
+  document.getElementById('filterType').value = '1';
+  document.getElementById('filterLimit').value = '20';
+  currentResults = []; currentSkip = 0; currentPage = 1;
+  document.getElementById('activePills').innerHTML = '';
+  showState('🔬', 'Ready to search', 'Filters have been reset. Start a new search above.');
+});
+
+// ── UTILS ──
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Auto-search if URL has params (future use)
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('specialty') || urlParams.get('city')) {
+  if (urlParams.get('specialty')) document.getElementById('navSpecialty').value = urlParams.get('specialty');
+  if (urlParams.get('city'))     document.getElementById('navCity').value = urlParams.get('city');
+  doSearch();
+}
+</script>
+</body>
+</html>
