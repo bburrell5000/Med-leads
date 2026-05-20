@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedLeads — Physician Intelligence for Medical Device Sales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -44,15 +45,15 @@
 
   /* ── NAV ── */
   nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
+    position: sticky;
+    top: 0;
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 48px;
+    padding: 16px 48px;
     border-bottom: 1px solid var(--line);
-    background: rgba(5, 13, 26, 0.85);
+    background: rgba(11, 31, 59, 0.97);
     backdrop-filter: blur(12px);
   }
 
@@ -116,45 +117,21 @@
   /* ── HERO ── */
   .hero {
     position: relative;
-    min-height: 100vh;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 80px 24px 60px;
+    padding: 48px 24px 60px;
     text-align: center;
     overflow: hidden;
   }
 
-  /* Grid lines background */
-  .hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 80%);
-    opacity: 0.4;
-    z-index: 0;
-  }
+  
 
-  /* Glow */
-  .hero-glow {
-    position: absolute;
-    width: 700px;
-    height: 700px;
-    background: radial-gradient(circle, rgba(47,134,199,0.14) 0%, transparent 70%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 0;
-    animation: pulse 6s ease-in-out infinite;
-  }
+  
 
-  @keyframes pulse {
-    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  
     50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
   }
 
@@ -174,7 +151,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: 32px;
-    animation: fadeUp 0.8s ease both;
+    
   }
 
   .badge-dot {
@@ -197,7 +174,7 @@
     letter-spacing: -2px;
     max-width: 900px;
     margin-bottom: 28px;
-    animation: fadeUp 0.8s 0.1s ease both;
+    
   }
 
   h1 em {
@@ -211,7 +188,7 @@
     max-width: 560px;
     line-height: 1.65;
     margin-bottom: 48px;
-    animation: fadeUp 0.8s 0.2s ease both;
+    
   }
 
   /* Search bar */
@@ -224,7 +201,7 @@
     border-radius: 10px;
     background: var(--navy-2);
     overflow: hidden;
-    animation: fadeUp 0.8s 0.3s ease both;
+    
     transition: border-color 0.2s, box-shadow 0.2s;
   }
 
@@ -282,7 +259,7 @@
     font-size: 11px;
     color: var(--muted);
     letter-spacing: 0.05em;
-    animation: fadeUp 0.8s 0.4s ease both;
+    
   }
 
   .hero-hint span { color: var(--teal); }
@@ -483,7 +460,7 @@
   .mock-result:nth-child(3) { animation-delay: 0.2s; }
 
   @keyframes shimmer {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 1; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -859,13 +836,13 @@
 
   /* ── ANIMATIONS ── */
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 1; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .reveal {
-    opacity: 0;
-    transform: translateY(24px);
+    opacity: 1;
+    transform: translateY(0);
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
 
@@ -906,7 +883,7 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-glow"></div>
+  
 
   <div class="hero-badge">
     <div class="badge-dot"></div>
