@@ -672,9 +672,9 @@
   <div class="paywall-page auth-page" style="flex-direction:column;align-items:center;justify-content:center;">
     <div class="paywall-card">
       <div class="paywall-lock">🔒</div>
-      <div class="paywall-eyebrow">Free preview limit reached</div>
-      <div class="paywall-title">You've seen <em>3 results.</em><br>Unlock the rest.</div>
-      <div class="paywall-sub">The NPI Registry has 1.2M+ verified physicians. You're one plan away from all of them.</div>
+      <div class="paywall-eyebrow">20 free leads used</div>
+      <div class="paywall-title">You've used your <em>20 free leads.</em><br>Upgrade to keep going.</div>
+      <div class="paywall-sub">You've seen what MedLeads can do. Upgrade to get hundreds or thousands of verified clinic emails for your full territory.</div>
 
       <!-- Blurred preview -->
       <div class="paywall-preview">
@@ -709,7 +709,7 @@
           <div class="preview-npi">NPI · ··········</div>
         </div>
         <div class="preview-overlay">
-          <div class="preview-overlay-text">147 more results locked · upgrade to view</div>
+          <div class="preview-overlay-text">Upgrade for 500–10,000 leads/month</div>
         </div>
       </div>
 
@@ -718,18 +718,18 @@
         <div class="paywall-plan" data-plan="solo" onclick="selectPaywallPlan('solo',this)">
           <div class="paywall-plan-name">Solo</div>
           <div class="paywall-plan-price"><sup>$</sup>79</div>
-          <div class="paywall-plan-mo">/mo</div>
+          <div class="paywall-plan-mo">500 leads/mo</div>
         </div>
         <div class="paywall-plan selected" data-plan="pro" onclick="selectPaywallPlan('pro',this)">
           <div class="paywall-plan-badge">Popular</div>
           <div class="paywall-plan-name">Pro</div>
           <div class="paywall-plan-price"><sup>$</sup>179</div>
-          <div class="paywall-plan-mo">/mo</div>
+          <div class="paywall-plan-mo">2,000 leads/mo</div>
         </div>
         <div class="paywall-plan" data-plan="team" onclick="selectPaywallPlan('team',this)">
           <div class="paywall-plan-name">Team</div>
           <div class="paywall-plan-price"><sup>$</sup>399</div>
-          <div class="paywall-plan-mo">/mo</div>
+          <div class="paywall-plan-mo">10,000 leads · 5 seats</div>
         </div>
       </div>
 
@@ -740,7 +740,7 @@
         <div class="perk">14-day free trial, cancel anytime</div>
       </div>
 
-      <button class="paywall-cta" onclick="showPage('page-signup')">Start 14-Day Free Trial →</button>
+      <button class="paywall-cta" onclick="showPage('page-signup')">Upgrade & Keep Searching →</button>
       <div class="paywall-login-link">Already have an account? <a onclick="showPage('page-login')">Sign in</a></div>
     </div>
   </div>
@@ -806,24 +806,24 @@
           <div class="plan-opt" onclick="selectPlan('solo',this)">
             <div class="plan-opt-name">Solo</div>
             <div class="plan-opt-price"><sup>$</sup>79</div>
-            <div class="plan-opt-period">/mo</div>
+            <div class="plan-opt-period">500 leads/mo</div>
           </div>
           <div class="plan-opt selected" onclick="selectPlan('pro',this)">
             <div class="plan-opt-badge">Popular</div>
             <div class="plan-opt-name">Pro</div>
             <div class="plan-opt-price"><sup>$</sup>179</div>
-            <div class="plan-opt-period">/mo</div>
+            <div class="plan-opt-period">2,000 leads/mo</div>
           </div>
           <div class="plan-opt" onclick="selectPlan('team',this)">
             <div class="plan-opt-name">Team</div>
             <div class="plan-opt-price"><sup>$</sup>399</div>
-            <div class="plan-opt-period">/mo</div>
+            <div class="plan-opt-period">10,000 leads · 5 seats</div>
           </div>
         </div>
 
         <div class="trial-notice">
           <div class="trial-notice-icon">✓</div>
-          <div class="trial-notice-text"><strong>14-day free trial</strong> — no credit card required. Full access from day one.</div>
+          <div class="trial-notice-text"><strong>20 free leads included</strong> — no credit card required. See real results before you pay.</div>
         </div>
 
         <!-- Form -->
@@ -864,12 +864,12 @@
         </div>
 
         <button class="submit-btn" id="signupBtn" onclick="handleSignup()">
-          Start Free Trial →
+          Start Searching →
         </button>
 
         <div class="form-legal">
           By signing up you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.<br>
-          No credit card required for trial.
+          Start with 20 free leads. No credit card needed.
         </div>
       </div>
     </div>
@@ -999,9 +999,9 @@
           <div class="dash-stat-change">this session</div>
         </div>
         <div class="dash-stat">
-          <div class="dash-stat-label">Days in Trial</div>
-          <div class="dash-stat-value teal">14</div>
-          <div class="dash-stat-change">remaining</div>
+          <div class="dash-stat-label">Free Leads Used</div>
+          <div class="dash-stat-value teal" id="freeLeadsUsed">0</div>
+          <div class="dash-stat-change">of 20 free leads</div>
         </div>
       </div>
 
@@ -1032,7 +1032,7 @@
               </div>
             </div>
             <div class="upgrade-nudge">
-              <div class="upgrade-nudge-text">Upgrade to <strong>Pro</strong> for unlimited emails, multi-city targeting, and CRM sync.</div>
+              <div class="upgrade-nudge-text">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
               <button class="upgrade-nudge-btn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
             </div>
           </div>
@@ -1142,7 +1142,7 @@ function handleSignup() {
   .then(r => r.json())
   .then(data => {
     btn.disabled = false; btn.classList.remove('loading');
-    btn.textContent = 'Start Free Trial →';
+    btn.textContent = 'Start Searching →';
     if (data.url) {
       // Store user info locally before redirecting to Stripe
       localStorage.setItem('ml_user', JSON.stringify({ firstName, lastName, email, plan: selectedPlan }));
@@ -1153,7 +1153,7 @@ function handleSignup() {
   })
   .catch(err => {
     btn.disabled = false; btn.classList.remove('loading');
-    btn.textContent = 'Start Free Trial →';
+    btn.textContent = 'Start Searching →';
     showToast('Connection error — try again');
   });
 }
@@ -1209,8 +1209,8 @@ function demoLogin() {
 function loadDashboard() {
   if (!currentUser) return;
 
-  const planLimits = { solo: 500, pro: 'Unlimited', team: 'Unlimited' };
-  const planLabels = { solo: 'Solo Plan', pro: 'Pro Plan', team: 'Team Plan' };
+  const planLimits = { solo: '500', pro: '2,000', team: '10,000' };
+  const planLabels = { solo: 'Solo · 500 leads/mo', pro: 'Pro · 2,000 leads/mo', team: 'Team · 10,000 leads · 5 Seats' };
 
   document.getElementById('dashFirstName').textContent = currentUser.firstName;
   document.getElementById('dashUserName').textContent  = currentUser.firstName + ' ' + (currentUser.lastName || '');
@@ -1219,7 +1219,7 @@ function loadDashboard() {
 
   const limit = planLimits[currentUser.plan] || 500;
   document.getElementById('statLimit').textContent = limit;
-  document.getElementById('usageNums').textContent = `0 / ${limit}`;
+  document.getElementById('usageNums').textContent = `0 / ${limit} leads`;
 }
 
 function handleLogout() {
