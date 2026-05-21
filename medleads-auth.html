@@ -1008,20 +1008,11 @@
       <div class="dash-actions">
         <!-- Quick search -->
         <div class="dash-card">
-          <div class="dash-card-title">Quick Search <span>Powered by NPI Registry</span></div>
+          <div class="dash-card-title">Quick Search <span>Powered by Google Maps</span></div>
           <div class="quick-search">
             <div class="qs-row">
-              <select class="qs-select" id="qsSpecialty">
-                <option value="">All Specialties</option>
-                <option value="207X00000X">Orthopedic Surgery</option>
-                <option value="207RC0000X">Cardiology</option>
-                <option value="2084N0400X">Neurology</option>
-                <option value="207RG0100X">General Surgery</option>
-                <option value="207P00000X">Emergency Medicine</option>
-                <option value="207L00000X">Anesthesiology</option>
-                <option value="2085R0202X">Diagnostic Radiology</option>
-              </select>
-              <input class="qs-input" id="qsCity" type="text" placeholder="City or state…">
+              <input class="qs-input" id="qsSpecialty" type="text" placeholder="Specialty (e.g. Cardiologists)">
+              <input class="qs-input" id="qsCity" type="text" placeholder="City, State (e.g. Miami, Florida)">
             </div>
             <button class="qs-btn" onclick="launchSearch()">Search Physicians →</button>
           </div>
@@ -1041,7 +1032,7 @@
               </div>
             </div>
             <div class="upgrade-nudge">
-              <div class="upgrade-nudge-text">Upgrade to <strong>Pro</strong> for unlimited exports and CRM sync.</div>
+              <div class="upgrade-nudge-text">Upgrade to <strong>Pro</strong> for unlimited emails, multi-city targeting, and CRM sync.</div>
               <button class="upgrade-nudge-btn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
             </div>
           </div>
@@ -1058,6 +1049,9 @@
 </div>
 
 <script>
+// ── BACKEND ──
+const BACKEND = 'https://medleads-backend.up.railway.app'; // update after Railway deploy
+
 // ── STATE ──
 let currentUser = null;
 let selectedPlan = 'pro';
@@ -1139,18 +1133,29 @@ function handleSignup() {
   btn.disabled = true; btn.classList.add('loading');
   btn.textContent = 'Creating account…';
 
-  setTimeout(() => {
-    // Store user
-    users[email] = { firstName, lastName, email, pw, plan: selectedPlan };
-    currentUser = users[email];
-
+  // Call backend to create Stripe checkout session
+  fetch(`${BACKEND}/create-checkout-session`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan: selectedPlan, email }),
+  })
+  .then(r => r.json())
+  .then(data => {
     btn.disabled = false; btn.classList.remove('loading');
     btn.textContent = 'Start Free Trial →';
-
-    loadDashboard();
-    showPage('page-dashboard');
-    showToast(`Welcome to MedLeads, ${firstName}! 🎉`);
-  }, 1600);
+    if (data.url) {
+      // Store user info locally before redirecting to Stripe
+      localStorage.setItem('ml_user', JSON.stringify({ firstName, lastName, email, plan: selectedPlan }));
+      window.location.href = data.url; // redirect to Stripe checkout
+    } else {
+      showToast('Error: ' + (data.error || 'Something went wrong'));
+    }
+  })
+  .catch(err => {
+    btn.disabled = false; btn.classList.remove('loading');
+    btn.textContent = 'Start Free Trial →';
+    showToast('Connection error — try again');
+  });
 }
 
 // ── LOGIN ──

@@ -887,7 +887,7 @@
 
   <div class="hero-badge">
     <div class="badge-dot"></div>
-    Verified NPI data · Updated daily
+    Google Maps powered · Emails included
   </div>
 
   <h1>Find the right physician<br><em>before</em> your competitor does.</h1>
@@ -897,21 +897,11 @@
   </p>
 
   <div class="search-wrap">
-    <select class="search-select">
-      <option>Specialty</option>
-      <option>Orthopedic Surgery</option>
-      <option>Cardiology</option>
-      <option>Neurology</option>
-      <option>Oncology</option>
-      <option>General Surgery</option>
-      <option>Radiology</option>
-      <option>Anesthesiology</option>
-    </select>
-    <input class="search-input" type="text" placeholder="City, state, or zip code…">
-    <button class="search-btn">Search Leads →</button>
+    <input class="search-input" type="text" id="heroSearch" placeholder="e.g. Family physicians in Phoenix, Arizona" style="flex:1">
+    <button class="search-btn" id="heroBtn">Search Leads →</button>
   </div>
 
-  <p class="hero-hint">Try: <span>Orthopedic Surgeons in Phoenix, AZ</span> · <span>Cardiologists in Houston, TX</span></p>
+  <p class="hero-hint">Try: <span>Cardiologists in Miami, Florida</span> · <span>Orthopedic Surgeons in Dallas, Texas</span></p>
 </section>
 
 <!-- TICKER -->
@@ -921,7 +911,7 @@
     <div class="ticker-sep">·</div>
     <div class="ticker-item"><strong>62</strong> specialties indexed</div>
     <div class="ticker-sep">·</div>
-    <div class="ticker-item"><strong>NPI Registry</strong> sourced</div>
+    <div class="ticker-item"><strong>Google Maps</strong> sourced</div>
     <div class="ticker-sep">·</div>
     <div class="ticker-item"><strong>Daily</strong> data refresh</div>
     <div class="ticker-sep">·</div>
@@ -931,7 +921,7 @@
     <div class="ticker-sep">·</div>
     <div class="ticker-item"><strong>62</strong> specialties indexed</div>
     <div class="ticker-sep">·</div>
-    <div class="ticker-item"><strong>NPI Registry</strong> sourced</div>
+    <div class="ticker-item"><strong>Google Maps</strong> sourced</div>
     <div class="ticker-sep">·</div>
     <div class="ticker-item"><strong>Daily</strong> data refresh</div>
     <div class="ticker-sep">·</div>
@@ -953,21 +943,21 @@
           <span class="step-num">01</span>
           <div>
             <div class="step-title">Set your filters</div>
-            <div class="step-desc">Choose specialty, geography, practice size, and insurance type. Narrow to exactly the physicians who use your device category.</div>
+            <div class="step-desc">Type any medical specialty (e.g. "Orthopedic Surgeons") and your target city. No rigid dropdowns — search exactly like you would on Google.</div>
           </div>
         </div>
         <div class="step">
           <span class="step-num">02</span>
           <div>
             <div class="step-title">Instant results</div>
-            <div class="step-desc">MedLeads pulls verified NPI data, practice contact info, and Healthgrades ratings in real time. Every record is clean and actionable.</div>
+            <div class="step-desc">MedLeads scrapes Google Maps for real clinics, visits each website, and extracts verified emails, phones, social profiles, and Google ratings.</div>
           </div>
         </div>
         <div class="step">
           <span class="step-num">03</span>
           <div>
             <div class="step-title">Export & go sell</div>
-            <div class="step-desc">Download your list as CSV or push directly to Salesforce and HubSpot. Your territory, your pipeline — populated in minutes.</div>
+            <div class="step-desc">Download your lead list as CSV or push directly to Salesforce and HubSpot. Name, email, phone, address, rating — all in one clean file.</div>
           </div>
         </div>
       </div>
@@ -982,32 +972,32 @@
         </div>
         <div class="mock-body">
           <div class="mock-search-row">
-            <div class="mock-tag">Orthopedic Surgery</div>
-            <div class="mock-tag-gray">Phoenix, AZ</div>
-            <div class="mock-tag-gray">≥ 4.0★</div>
+            <div class="mock-tag">Cardiologists</div>
+            <div class="mock-tag-gray">Miami, Florida</div>
+            <div class="mock-tag-gray">≥ 4.5★</div>
           </div>
           <div class="mock-results">
             <div class="mock-result">
               <div class="mock-result-left">
                 <div class="mock-name">Dr. Sarah Patel, MD</div>
-                <div class="mock-spec">Orthopedic Surgery · Joint Replacement</div>
-                <div class="mock-meta">Banner Health · (480) 555-0182</div>
+                <div class="mock-spec">Cardiology · Heart &amp; Vascular</div>
+                <div class="mock-meta">📧 info@miamiheartvascular.com · (305) 555-0199</div>
               </div>
               <div class="mock-verified">✓ Verified</div>
             </div>
             <div class="mock-result">
               <div class="mock-result-left">
                 <div class="mock-name">Dr. James Okafor, MD</div>
-                <div class="mock-spec">Orthopedic Surgery · Spine</div>
-                <div class="mock-meta">HonorHealth · (602) 555-0341</div>
+                <div class="mock-spec">Cardiology · Interventional</div>
+                <div class="mock-meta">📧 dr.okafor@heartcaremiami.com · (305) 555-0341</div>
               </div>
               <div class="mock-verified">✓ Verified</div>
             </div>
             <div class="mock-result">
               <div class="mock-result-left">
                 <div class="mock-name">Dr. Monica Reyes, DO</div>
-                <div class="mock-spec">Orthopedic Surgery · Sports Med</div>
-                <div class="mock-meta">Valleywise Health · (623) 555-0094</div>
+                <div class="mock-spec">Cardiology · Electrophysiology</div>
+                <div class="mock-meta">📧 contact@reyes-cardiology.com · (786) 555-0094</div>
               </div>
               <div class="mock-verified">✓ Verified</div>
             </div>
@@ -1027,33 +1017,33 @@
     <div class="features-grid reveal">
       <div class="feature-card">
         <div class="feature-icon">🎯</div>
-        <div class="feature-title">Specialty Filtering</div>
-        <div class="feature-desc">Filter by 62 medical specialties and sub-specialties. Target exactly the physicians who prescribe or use your device category.</div>
+        <div class="feature-title">Any Specialty or Niche</div>
+        <div class="feature-desc">Search by any medical niche — "Cardiologists", "Orthopedic Surgeons", "Pediatricians" — plus any city or region. No dropdown limits.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">📍</div>
-        <div class="feature-title">Territory Mapping</div>
-        <div class="feature-desc">Search by city, state, zip code, or radius. Build territory lists that match your assigned region without any overlap.</div>
+        <div class="feature-title">Verified Email Addresses</div>
+        <div class="feature-desc">Emails are extracted directly from each clinic's own website — not guessed or purchased. Real public contact addresses ready for outreach.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">✅</div>
-        <div class="feature-title">NPI Verified Data</div>
-        <div class="feature-desc">Every record is cross-referenced with the CMS National Provider Identifier registry. No dead numbers, no outdated addresses.</div>
+        <div class="feature-title">Google Maps Powered</div>
+        <div class="feature-desc">Pulls real clinic and practitioner listings from Google Maps, then visits each website to extract contact details — no stale databases.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">📊</div>
-        <div class="feature-title">Practice Intelligence</div>
-        <div class="feature-desc">See patient volume indicators, review scores, practice size, and insurance accepted — so you prioritize high-value targets first.</div>
+        <div class="feature-title">Ratings &amp; Reviews</div>
+        <div class="feature-desc">Every record includes Google rating and total review count so you can prioritize high-volume, well-rated practices first.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">⚡</div>
-        <div class="feature-title">One-Click Export</div>
-        <div class="feature-desc">Download clean CSV files or push directly to Salesforce, HubSpot, or any CRM via webhook. Your workflow, uninterrupted.</div>
+        <div class="feature-title">Social Profiles Included</div>
+        <div class="feature-desc">Captures Facebook, LinkedIn, Instagram, and X profiles alongside emails and phones — giving you multiple outreach channels per lead.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🔄</div>
-        <div class="feature-title">Daily Data Refresh</div>
-        <div class="feature-desc">Our scrapers run nightly. New practices, updated contact info, and recently licensed physicians appear in your results automatically.</div>
+        <div class="feature-title">One-Click CSV Export</div>
+        <div class="feature-desc">Download your full lead list as a clean CSV or push directly to Salesforce, HubSpot, or any CRM. Your workflow, uninterrupted.</div>
       </div>
     </div>
   </div>
@@ -1115,7 +1105,7 @@
         <hr class="plan-divider">
         <ul class="plan-features">
           <li class="active">500 lead exports / month</li>
-          <li class="active">All 62 specialties</li>
+          <li class="active">All any specialty</li>
           <li class="active">City & state filtering</li>
           <li class="active">CSV export</li>
           <li>CRM integrations</li>
@@ -1133,7 +1123,7 @@
         <hr class="plan-divider">
         <ul class="plan-features">
           <li class="active">Unlimited lead exports</li>
-          <li class="active">All 62 specialties</li>
+          <li class="active">All any specialty</li>
           <li class="active">Zip code & radius search</li>
           <li class="active">CSV export</li>
           <li class="active">Salesforce & HubSpot sync</li>
@@ -1150,7 +1140,7 @@
         <hr class="plan-divider">
         <ul class="plan-features">
           <li class="active">Unlimited lead exports</li>
-          <li class="active">All 62 specialties</li>
+          <li class="active">All any specialty</li>
           <li class="active">Zip code & radius search</li>
           <li class="active">CSV export</li>
           <li class="active">Salesforce & HubSpot sync</li>
@@ -1207,12 +1197,11 @@
   reveals.forEach(el => observer.observe(el));
 
   // Search interaction
-  document.querySelector('.search-btn').addEventListener('click', () => { window.location.href = 'medleads-auth.html'; return;
-    const input = document.querySelector('.search-input').value;
-    const spec = document.querySelector('.search-select').value;
-    if (input || spec !== 'Specialty') {
-      document.querySelector('#start').scrollIntoView({ behavior: 'smooth' });
-    }
+  document.getElementById('heroBtn').addEventListener('click', () => {
+    window.location.href = 'medleads-auth.html';
+  });
+  document.getElementById('heroSearch').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.location.href = 'medleads-auth.html';
   });
 </script>
 </body>

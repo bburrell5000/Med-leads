@@ -512,7 +512,7 @@
       <option value="207RG0300X">Gastroenterology</option>
       <option value="207RP1001X">Pulmonary Disease</option>
     </select>
-    <input class="nav-input" id="navCity" type="text" placeholder="City or state…">
+    <input class="nav-input" id="navCity" type="text" placeholder="City, State (e.g. Miami, Florida)">
     <button class="nav-btn" id="navSearchBtn">Search →</button>
   </div>
 </nav>
@@ -523,44 +523,22 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="filter-group">
-      <div class="filter-label">Provider Type</div>
-      <select class="filter-select" id="filterType">
-        <option value="1">Individual (MD / DO)</option>
-        <option value="2">Organization / Group</option>
-      </select>
+      <div class="filter-label">Specialty / Niche</div>
+      <input class="filter-input" id="filterSpecialty" type="text" placeholder="e.g. Orthopedic Surgeons">
     </div>
 
     <div class="filter-group">
-      <div class="filter-label">State</div>
-      <select class="filter-select" id="filterState">
-        <option value="">Any state</option>
-        <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
-        <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
-        <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
-        <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
-        <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
-        <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
-        <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
-        <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
-        <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
-        <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
-        <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
-        <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
-        <option>WI</option><option>WY</option>
-      </select>
+      <div class="filter-label">Location</div>
+      <input class="filter-input" id="filterState" type="text" placeholder="e.g. Miami, Florida">
     </div>
 
     <div class="filter-group">
-      <div class="filter-label">Last Name Filter</div>
-      <input class="filter-input" id="filterLastName" type="text" placeholder="e.g. Smith">
-    </div>
-
-    <div class="filter-group">
-      <div class="filter-label">Gender</div>
+      <div class="filter-label">Min. Google Rating</div>
       <select class="filter-select" id="filterGender">
-        <option value="">Any</option>
-        <option value="M">Male</option>
-        <option value="F">Female</option>
+        <option value="">Any rating</option>
+        <option value="3">3.0+</option>
+        <option value="4">4.0+</option>
+        <option value="4.5">4.5+</option>
       </select>
     </div>
 
@@ -587,8 +565,8 @@
   <main class="main">
     <div class="results-header">
       <div class="results-meta">
-        <div class="results-title" id="resultsTitle">Search for Physicians</div>
-        <div class="results-sub" id="resultsSub">Use the search bar or filters to find verified providers</div>
+        <div class="results-title" id="resultsTitle">Search for Physician Leads</div>
+        <div class="results-sub" id="resultsSub">Enter a specialty and city to find clinic emails and contacts</div>
       </div>
       <button class="export-btn" id="exportBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
@@ -602,7 +580,7 @@
       <div class="state-box">
         <div class="state-icon">🔬</div>
         <div class="state-title">Ready to find leads</div>
-        <div class="state-sub">Search by specialty and location above, or apply sidebar filters to pull verified NPI physician records.</div>
+        <div class="state-sub">Enter a specialty (e.g. "Cardiologists") and a city to pull clinic emails, phone numbers, Google ratings, and social profiles.</div>
       </div>
     </div>
 
@@ -738,7 +716,7 @@ function renderResults(results, total) {
   document.getElementById('resultsTitle').textContent =
     `${specName} · ${loc}`;
   document.getElementById('resultsSub').innerHTML =
-    `Showing <strong>${results.length}</strong> of <strong>${total.toLocaleString()}</strong> verified providers · NPI Registry`;
+    `Showing <strong>${results.length}</strong> of <strong>${total.toLocaleString()}</strong> verified providers · Google Maps + Website Crawl`;
   document.getElementById('sidebarCount').innerHTML =
     `<strong>${total.toLocaleString()}</strong> total results`;
 
@@ -813,7 +791,7 @@ function buildCard(r, idx) {
           <div class="card-name">${escHtml(name)}</div>
           <div class="card-specialty">${escHtml(specialty)}</div>
           <div class="card-badges">
-            <span class="badge badge-verified">✓ NPI Verified</span>
+            <span class="badge badge-verified">✓ Email Verified</span>
             <span class="badge badge-type">${entityType}</span>
             ${gender ? `<span class="badge badge-gender">${gender}</span>` : ''}
           </div>
