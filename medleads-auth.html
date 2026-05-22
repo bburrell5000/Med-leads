@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedLeads — Sign Up</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1049,6 +1050,69 @@
 </div>
 
 <script>
+// ── SUPABASE ──
+const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Check if user is already logged in via Supabase
+async function checkSupabaseSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    currentUser = {
+      firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email.split('@')[0],
+      lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+      email: session.user.email,
+      plan: 'free',
+      avatar: session.user.user_metadata?.avatar_url || null
+    };
+    // Get their plan from our backend
+    try {
+      const res = await fetch(`${BACKEND}/user-status?email=${encodeURIComponent(session.user.email)}`);
+      const data = await res.json();
+      if (data.plan) currentUser.plan = data.plan;
+      currentUser.leadsUsed = data.leads_used || 0;
+      currentUser.leadsLimit = data.leads_limit || 20;
+    } catch(e) {}
+    loadDashboard();
+    showPage('page-dashboard');
+  }
+}
+
+// Google Sign In
+async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.href
+    }
+  });
+  if (error) showToast('Google sign in failed: ' + error.message);
+}
+
+// Handle OAuth redirect callback
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    currentUser = {
+      firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email.split('@')[0],
+      lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+      email: session.user.email,
+      plan: 'free',
+      avatar: session.user.user_metadata?.avatar_url || null
+    };
+    try {
+      const res = await fetch(`${BACKEND}/user-status?email=${encodeURIComponent(session.user.email)}`);
+      const data = await res.json();
+      if (data.plan) currentUser.plan = data.plan;
+      currentUser.leadsUsed = data.leads_used || 0;
+      currentUser.leadsLimit = data.leads_limit || 20;
+    } catch(e) {}
+    loadDashboard();
+    showPage('page-dashboard');
+    showToast(`Welcome, ${currentUser.firstName}! 🎉`);
+  }
+});
+
 // ── BACKEND ──
 const BACKEND = 'https://medleads-backend-production.up.railway.app'; // update after Railway deploy
 
@@ -1222,8 +1286,10 @@ function loadDashboard() {
   document.getElementById('usageNums').textContent = `0 / ${limit} leads`;
 }
 
-function handleLogout() {
+async function handleLogout() {
+  await supabase.auth.signOut();
   currentUser = null;
+  localStorage.removeItem('ml_user');
   showPage('page-paywall');
   showToast('Signed out successfully');
 }
