@@ -1075,11 +1075,11 @@
 // ── SUPABASE ──
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Check if user is already logged in via Supabase
 async function checkSupabaseSession() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = {
       firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email.split('@')[0],
@@ -1103,7 +1103,7 @@ async function checkSupabaseSession() {
 
 // Google Sign In
 async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: window.location.href
@@ -1113,7 +1113,7 @@ async function signInWithGoogle() {
 }
 
 // Handle OAuth redirect callback
-supabase.auth.onAuthStateChange(async (event, session) => {
+sb.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     currentUser = {
       firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email.split('@')[0],
@@ -1309,7 +1309,7 @@ function loadDashboard() {
 }
 
 async function handleLogout() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   currentUser = null;
   localStorage.removeItem('ml_user');
   showPage('page-paywall');
