@@ -380,42 +380,78 @@
 
   /* Preview blurred results */
   .paywall-preview {
-    background: var(--navy-3); border: 1px solid var(--line);
     border-radius: 10px; overflow: hidden; margin-bottom: 32px;
-    position: relative;
+    position: relative; display: flex; flex-direction: column; gap: 10px;
   }
 
-  .preview-row {
-    padding: 14px 18px; border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px;
+  .preview-card {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 12px;
   }
-  .preview-row:last-child { border-bottom: none; }
-  .preview-row.blurred { filter: blur(5px); user-select: none; }
+  .preview-card.blurred { filter: blur(6px); user-select: none; pointer-events: none; }
 
+  .preview-card-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
   .preview-left { display: flex; align-items: center; gap: 12px; }
   .preview-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     background: var(--teal-dim); border: 1px solid var(--teal-bdr);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--teal);
+    font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--teal);
     flex-shrink: 0;
   }
-  .preview-name { font-size: 14px; font-weight: 600; }
+  .preview-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
   .preview-spec {
     font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--teal); letter-spacing: .05em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .preview-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .preview-badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    padding: 3px 8px; border-radius: 100px;
+  }
+  .preview-badge-noemail {
+    background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3);
+    color: #ff4d6d;
+  }
+  .preview-badge-email {
+    background: var(--teal-dim); border: 1px solid var(--teal-bdr);
     color: var(--teal);
   }
-  .preview-npi {
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-    color: var(--muted);
+  .preview-badge-rating {
+    background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3);
+    color: var(--teal);
   }
+  .preview-rating {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--teal); white-space: nowrap;
+    background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25);
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .preview-data-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+  }
+  .preview-data-col { display: flex; flex-direction: column; gap: 3px; }
+  .preview-data-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+  }
+  .preview-data-val { font-size: 12px; color: var(--white); }
+  .preview-data-val a { color: var(--teal); text-decoration: none; font-size: 11px; }
+  .preview-address {
+    font-size: 11px; color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .preview-website { font-size: 11px; color: var(--teal); }
 
   .preview-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to bottom, transparent 0%, var(--navy-3) 70%);
+    position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
+    background: linear-gradient(to bottom, transparent 0%, var(--navy) 75%);
     display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 20px;
+    padding-bottom: 16px; pointer-events: none;
   }
   .preview-overlay-text {
     font-family: 'IBM Plex Mono', monospace; font-size: 11px;
@@ -737,40 +773,113 @@
       <div class="paywall-title" id="paywallTitle">Get your <em>20 free leads</em><br>— start searching now.</div>
       <div class="paywall-sub" id="paywallSub">Sign in with Google or create a free account to instantly search physician leads including emails, phone numbers, and Google ratings.</div>
 
-      <!-- Blurred preview -->
+      <!-- Blurred preview — matches real lead card layout -->
       <div class="paywall-preview">
-        <div class="preview-row">
-          <div class="preview-left">
-            <div class="preview-avatar">SP</div>
-            <div>
-              <div class="preview-name">Dr. Sarah Patel, MD</div>
-              <div class="preview-spec">Orthopedic Surgery</div>
+
+        <!-- Card 1: Fully visible — fictional example -->
+        <div class="preview-card">
+          <div class="preview-card-top">
+            <div class="preview-left">
+              <div class="preview-avatar">RH</div>
+              <div>
+                <div class="preview-name">Riverside Heart Clinic</div>
+                <div class="preview-spec">Dallas, Texas</div>
+                <div class="preview-badges">
+                  <span class="preview-badge preview-badge-email">✓ Email found</span>
+                  <span class="preview-badge preview-badge-rating">★ 4.9</span>
+                </div>
+              </div>
+            </div>
+            <div class="preview-rating">★ 4.9 (87 reviews)</div>
+          </div>
+          <div class="preview-data-row">
+            <div class="preview-data-col">
+              <div class="preview-data-label">Email(s)</div>
+              <div class="preview-data-val" style="font-size:11px">dr.marcus@riversideheart.com</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Phone</div>
+              <div class="preview-data-val">(214) 555-0192</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Social</div>
+              <div class="preview-data-val">
+                <a href="#">LinkedIn</a> · <a href="#">Facebook</a>
+              </div>
             </div>
           </div>
-          <div class="preview-npi">NPI · 1234567890</div>
+          <div class="preview-address">4821 Elm Street Suite 310 Dallas Texas 75201 US</div>
+          <div class="preview-website">https://riversideheartclinic.com/</div>
         </div>
-        <div class="preview-row blurred">
-          <div class="preview-left">
-            <div class="preview-avatar">JO</div>
-            <div>
-              <div class="preview-name">Dr. James Okafor, MD</div>
-              <div class="preview-spec">Orthopedic Surgery</div>
+
+        <!-- Card 2: Blurred -->
+        <div class="preview-card blurred">
+          <div class="preview-card-top">
+            <div class="preview-left">
+              <div class="preview-avatar">NW</div>
+              <div>
+                <div class="preview-name">Northgate Women's Health</div>
+                <div class="preview-spec">Austin, Texas</div>
+                <div class="preview-badges">
+                  <span class="preview-badge preview-badge-email">✓ Email found</span>
+                  <span class="preview-badge preview-badge-rating">★ 4.7</span>
+                </div>
+              </div>
+            </div>
+            <div class="preview-rating">★ 4.7 (53 reviews)</div>
+          </div>
+          <div class="preview-data-row">
+            <div class="preview-data-col">
+              <div class="preview-data-label">Email(s)</div>
+              <div class="preview-data-val">info@northgatewomens.com</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Phone</div>
+              <div class="preview-data-val">(512) 555-0348</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Social</div>
+              <div class="preview-data-val"><a href="#">Instagram</a> · <a href="#">Facebook</a></div>
             </div>
           </div>
-          <div class="preview-npi">NPI · ··········</div>
+          <div class="preview-address">902 Congress Ave Suite 140 Austin Texas 78701 US</div>
         </div>
-        <div class="preview-row blurred">
-          <div class="preview-left">
-            <div class="preview-avatar">MR</div>
-            <div>
-              <div class="preview-name">Dr. Monica Reyes, DO</div>
-              <div class="preview-spec">Orthopedic Surgery</div>
+
+        <!-- Card 3: Blurred -->
+        <div class="preview-card blurred">
+          <div class="preview-card-top">
+            <div class="preview-left">
+              <div class="preview-avatar">SP</div>
+              <div>
+                <div class="preview-name">Sunstate Orthopedic Partners</div>
+                <div class="preview-spec">Miami, Florida</div>
+                <div class="preview-badges">
+                  <span class="preview-badge preview-badge-email">✓ Email found</span>
+                  <span class="preview-badge preview-badge-rating">★ 4.8</span>
+                </div>
+              </div>
+            </div>
+            <div class="preview-rating">★ 4.8 (119 reviews)</div>
+          </div>
+          <div class="preview-data-row">
+            <div class="preview-data-col">
+              <div class="preview-data-label">Email(s)</div>
+              <div class="preview-data-val">contact@sunstateortho.com</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Phone</div>
+              <div class="preview-data-val">(305) 555-0871</div>
+            </div>
+            <div class="preview-data-col">
+              <div class="preview-data-label">Social</div>
+              <div class="preview-data-val"><a href="#">LinkedIn</a> · <a href="#">Instagram</a></div>
             </div>
           </div>
-          <div class="preview-npi">NPI · ··········</div>
+          <div class="preview-address">1200 Brickell Ave Suite 500 Miami Florida 33131 US</div>
         </div>
+
         <div class="preview-overlay">
-          <div class="preview-overlay-text">Upgrade for 500–10,000 leads/month</div>
+          <div class="preview-overlay-text">Sign in to unlock 20 free leads →</div>
         </div>
       </div>
 
