@@ -191,75 +191,56 @@
     
   }
 
-  /* Search bar */
-  .search-wrap {
+  /* Hero CTA buttons */
+  .hero-cta-row {
     display: flex;
-    gap: 0;
-    width: 100%;
-    max-width: 620px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--navy-2);
-    overflow: hidden;
-    
-    transition: border-color 0.2s, box-shadow 0.2s;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
   }
-
-  .search-wrap:focus-within {
-    border-color: var(--teal-border);
-    box-shadow: 0 0 0 3px var(--teal-dim);
-  }
-
-  .search-select {
-    background: var(--navy-3);
-    border: none;
-    border-right: 1px solid var(--line);
-    color: var(--white);
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 14px;
-    padding: 0 16px;
-    cursor: pointer;
-    outline: none;
-    min-width: 160px;
-  }
-
-  .search-select option { background: var(--navy-2); }
-
-  .search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--white);
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 15px;
-    padding: 16px 20px;
-    outline: none;
-  }
-
-  .search-input::placeholder { color: var(--muted); }
 
   .search-btn {
     background: var(--teal);
     border: none;
     color: var(--navy);
     font-family: 'Instrument Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 40px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, transform 0.15s;
     white-space: nowrap;
+    letter-spacing: 0.01em;
   }
 
-  .search-btn:hover { opacity: 0.85; }
+  .search-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .hero-secondary-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 15px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .hero-secondary-btn:hover { border-color: var(--teal-border); color: var(--white); }
 
   .hero-hint {
-    margin-top: 20px;
+    margin-top: 18px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--muted);
     letter-spacing: 0.05em;
-    
+    text-align: center;
   }
 
   .hero-hint span { color: var(--teal); }
@@ -443,45 +424,98 @@
     border-radius: 4px;
   }
 
-  .mock-results { display: flex; flex-direction: column; gap: 8px; }
+  .mock-results { display: flex; flex-direction: column; gap: 10px; }
 
   .mock-result {
     background: var(--navy-3);
     border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 14px 16px;
+    border-radius: 10px;
+    padding: 16px 18px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    animation: shimmer 1s ease both;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeUp 0.4s ease both;
   }
 
   .mock-result:nth-child(2) { animation-delay: 0.1s; }
   .mock-result:nth-child(3) { animation-delay: 0.2s; }
 
-  @keyframes shimmer {
-    from { opacity: 1; transform: translateY(8px); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .mock-result-left { display: flex; flex-direction: column; gap: 4px; }
+  .mock-result-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .mock-result-left { display: flex; align-items: center; gap: 10px; }
+
+  .mock-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid var(--teal-border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 13px; color: var(--teal);
+    flex-shrink: 0;
+  }
 
   .mock-name {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--white);
+    margin-bottom: 2px;
   }
 
   .mock-spec {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     color: var(--teal);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
   }
 
-  .mock-meta {
+  .mock-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .mock-badge {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
+    font-size: 9px; padding: 2px 7px;
+    border-radius: 100px;
+  }
+  .mock-badge-email {
+    background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); color: var(--teal);
+  }
+  .mock-badge-rating {
+    background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.2); color: var(--teal);
+  }
+
+  .mock-rating {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--teal);
+    background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  .mock-data-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+  }
+
+  .mock-data-col { display: flex; flex-direction: column; gap: 2px; }
+
+  .mock-data-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 8px;
+    color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
+  }
+
+  .mock-data-val {
+    font-size: 11px; color: var(--white);
+  }
+  .mock-data-val-link { font-size: 10px; color: var(--teal); }
+
+  .mock-address {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted);
   }
 
   .mock-verified {
@@ -492,6 +526,7 @@
     font-size: 9px;
     padding: 3px 8px;
     border-radius: 100px;
+    white-space: nowrap;
   }
 
   /* ── FEATURES ── */
@@ -896,16 +931,12 @@
     Get 20 verified physician leads free — including emails, phone numbers, and Google ratings. No credit card. No time limit. Just results.
   </p>
 
-  <div class="search-wrap">
-    <input class="search-input" type="text" id="heroSearch" placeholder="e.g. Family physicians in Phoenix, Arizona" style="flex:1">
-    <button class="search-btn" id="heroBtn">Get Free Leads →</button>
+  <div class="hero-cta-row">
+    <button class="search-btn" id="heroBtn">Start Searching Free →</button>
+    <a class="hero-secondary-btn" href="medleads-auth.html">Sign In</a>
   </div>
 
-  <p class="hero-hint" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <span>🔒 Sign in for 20 free leads — no credit card</span>
-    <span style="color:var(--line)">|</span>
-    <span>Try: <span style="color:var(--teal)">Cardiologists in Miami</span> · <span style="color:var(--teal)">Orthopedic Surgeons in Dallas</span></span>
-  </p>
+  <p class="hero-hint">🔒 No credit card required &nbsp;·&nbsp; 20 free leads on sign up &nbsp;·&nbsp; Results in under 2 minutes</p>
 </section>
 
 <!-- TICKER -->
@@ -981,30 +1012,106 @@
             <div class="mock-tag-gray">≥ 4.5★</div>
           </div>
           <div class="mock-results">
+
+            <!-- Card 1 -->
             <div class="mock-result">
-              <div class="mock-result-left">
-                <div class="mock-name">Dr. Sarah Patel, MD</div>
-                <div class="mock-spec">Cardiology · Heart &amp; Vascular</div>
-                <div class="mock-meta">📧 info@miamiheartvascular.com · (305) 555-0199</div>
+              <div class="mock-result-top">
+                <div class="mock-result-left">
+                  <div class="mock-avatar">MH</div>
+                  <div>
+                    <div class="mock-name">Miami Heart & Vascular Center</div>
+                    <div class="mock-spec">Miami, Florida</div>
+                    <div class="mock-badges">
+                      <span class="mock-badge mock-badge-email">✓ Email found</span>
+                      <span class="mock-badge mock-badge-rating">★ 4.9</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mock-rating">★ 4.9 (214 reviews)</div>
               </div>
-              <div class="mock-verified">✓ Verified</div>
+              <div class="mock-data-row">
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Email(s)</div>
+                  <div class="mock-data-val">info@miamiheartvascular.com</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Phone</div>
+                  <div class="mock-data-val">(305) 555-0199</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Social</div>
+                  <div class="mock-data-val-link">LinkedIn · Facebook · Instagram</div>
+                </div>
+              </div>
+              <div class="mock-address">1450 NW 10th Ave Suite 302 Miami Florida 33136 US</div>
             </div>
+
+            <!-- Card 2 -->
             <div class="mock-result">
-              <div class="mock-result-left">
-                <div class="mock-name">Dr. James Okafor, MD</div>
-                <div class="mock-spec">Cardiology · Interventional</div>
-                <div class="mock-meta">📧 dr.okafor@heartcaremiami.com · (305) 555-0341</div>
+              <div class="mock-result-top">
+                <div class="mock-result-left">
+                  <div class="mock-avatar">JO</div>
+                  <div>
+                    <div class="mock-name">Okafor Interventional Cardiology</div>
+                    <div class="mock-spec">Coral Gables, Florida</div>
+                    <div class="mock-badges">
+                      <span class="mock-badge mock-badge-email">✓ Email found</span>
+                      <span class="mock-badge mock-badge-rating">★ 4.8</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mock-rating">★ 4.8 (97 reviews)</div>
               </div>
-              <div class="mock-verified">✓ Verified</div>
+              <div class="mock-data-row">
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Email(s)</div>
+                  <div class="mock-data-val">dr.okafor@heartcaremiami.com</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Phone</div>
+                  <div class="mock-data-val">(305) 555-0341</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Social</div>
+                  <div class="mock-data-val-link">LinkedIn · Instagram</div>
+                </div>
+              </div>
+              <div class="mock-address">2601 SW 37th Ave Suite 110 Coral Gables Florida 33133 US</div>
             </div>
+
+            <!-- Card 3 -->
             <div class="mock-result">
-              <div class="mock-result-left">
-                <div class="mock-name">Dr. Monica Reyes, DO</div>
-                <div class="mock-spec">Cardiology · Electrophysiology</div>
-                <div class="mock-meta">📧 contact@reyes-cardiology.com · (786) 555-0094</div>
+              <div class="mock-result-top">
+                <div class="mock-result-left">
+                  <div class="mock-avatar">MR</div>
+                  <div>
+                    <div class="mock-name">Reyes Electrophysiology Group</div>
+                    <div class="mock-spec">Brickell, Florida</div>
+                    <div class="mock-badges">
+                      <span class="mock-badge mock-badge-email">✓ Email found</span>
+                      <span class="mock-badge mock-badge-rating">★ 4.7</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mock-rating">★ 4.7 (63 reviews)</div>
               </div>
-              <div class="mock-verified">✓ Verified</div>
+              <div class="mock-data-row">
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Email(s)</div>
+                  <div class="mock-data-val">contact@reyes-cardiology.com</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Phone</div>
+                  <div class="mock-data-val">(786) 555-0094</div>
+                </div>
+                <div class="mock-data-col">
+                  <div class="mock-data-label">Social</div>
+                  <div class="mock-data-val-link">Facebook · Instagram</div>
+                </div>
+              </div>
+              <div class="mock-address">1200 Brickell Ave Suite 800 Miami Florida 33131 US</div>
             </div>
+
           </div>
         </div>
       </div>
@@ -1204,17 +1311,15 @@
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // Search interaction — pass query to auth page
-  function goToSearch() {
-    const query = document.getElementById('heroSearch').value.trim();
-    const params = new URLSearchParams();
-    if (query) params.set('q', query);
-    params.set('signup', '1'); // hint to auth page: show sign-up first
-    window.location.href = 'medleads-auth.html?' + params.toString();
-  }
-  document.getElementById('heroBtn').addEventListener('click', goToSearch);
-  document.getElementById('heroSearch').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') goToSearch();
+  // CTA button — check Supabase session, route accordingly
+  document.getElementById('heroBtn').addEventListener('click', async () => {
+    // Quick check: is there an active session in localStorage?
+    const hasSession = Object.keys(localStorage).some(k => k.includes('supabase') || k.includes('sb-'));
+    if (hasSession) {
+      window.location.href = 'medleads-search.html';
+    } else {
+      window.location.href = 'medleads-auth.html?signup=1';
+    }
   });
 </script>
 </body>
