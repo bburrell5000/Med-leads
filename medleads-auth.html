@@ -1225,9 +1225,6 @@
           <div class="form-divider-line"></div>
         </div>
 
-        <button class="submit-btn" style="background:var(--navy-3);color:var(--white);border:1px solid var(--line)" onclick="demoLogin()">
-          👁 Use demo account
-        </button>
       </div>
     </div>
   </div>
@@ -1629,19 +1626,6 @@ function handleLogin() {
       errEl.classList.add('show');
     }
   }, 1200);
-}
-
-function demoLogin() {
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-
-  setTimeout(() => {
-    currentUser = { firstName: 'Brandon', lastName: 'T', email: 'demo@medleads.io', plan: 'pro' };
-    loadDashboard();
-    showPage('page-dashboard');
-    showToast('Signed in as demo account');
-    btn.disabled = false;
-  }, 900);
 }
 
 // ── DASHBOARD ──
