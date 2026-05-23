@@ -1722,6 +1722,22 @@ async function loadSearchHistory() {
       const query = [s.specialty, s.location].filter(Boolean).join(' . ') || 'Search';
       const card = document.createElement('div');
       card.className = 'history-card';
+      
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'history-btn history-btn-primary';
+      viewBtn.textContent = 'View Saved Results ->';
+      viewBtn.addEventListener('click', () => loadSavedSearch(s.id, s.specialty || '', s.location || ''));
+      
+      const delBtn = document.createElement('button');
+      delBtn.className = 'history-btn history-btn-secondary';
+      delBtn.textContent = 'Delete';
+      delBtn.addEventListener('click', () => deleteSearch(s.id, delBtn));
+      
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'history-actions';
+      actionsDiv.appendChild(viewBtn);
+      actionsDiv.appendChild(delBtn);
+      
       card.innerHTML = `
         <div class="history-card-top">
           <div>
@@ -1730,11 +1746,8 @@ async function loadSearchHistory() {
           </div>
           <div class="history-badge">${s.result_count} leads</div>
         </div>
-        <div class="history-actions">
-          <button class="history-btn history-btn-primary" onclick="loadSavedSearch(${s.id}, ${JSON.stringify(s.specialty || '')}, ${JSON.stringify(s.location || '')})">View Saved Results -></button>
-          <button class="history-btn history-btn-secondary" onclick="deleteSearch(${s.id}, this)">Delete</button>
-        </div>
       `;
+      card.appendChild(actionsDiv);
       grid.appendChild(card);
     });
   } catch(e) {
