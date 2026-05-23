@@ -560,6 +560,21 @@
   }
   .dash-user-name { font-size: 14px; font-weight: 500; }
 
+  .dash-upgrade-btn {
+    background: var(--teal);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+  .dash-upgrade-btn:hover { opacity: .85; }
+
   .dash-logout {
     background: transparent; border: 1px solid var(--line); border-radius: 6px;
     color: var(--muted); font-family: 'Instrument Sans', sans-serif;
@@ -1230,6 +1245,7 @@
       </a>
       <div class="dash-nav-right">
         <div class="dash-plan-badge" id="dashPlanBadge">Pro Plan</div>
+        <button class="dash-upgrade-btn" id="dashUpgradeBtn" onclick="openUpgradeModal()" style="display:none">Upgrade Plan ↑</button>
         <div class="dash-user">
           <div class="dash-avatar" id="dashAvatar">B</div>
           <div class="dash-user-name" id="dashUserName">Brandon</div>
@@ -1654,6 +1670,16 @@ function loadDashboard() {
   document.getElementById('usageNums').textContent = `${leadsUsed} / ${limitDisplay} leads`;
   document.getElementById('usageBar').style.width = Math.max(pct, 1) + '%';
 
+  // Show upgrade button in nav for all plans except team
+  const upgradeNavBtn = document.getElementById('dashUpgradeBtn');
+  if (upgradeNavBtn) {
+    upgradeNavBtn.style.display = (currentUser.plan === 'team') ? 'none' : '';
+    // Customize label based on current plan
+    const nextPlan = { free: 'Solo', solo: 'Pro', pro: 'Team' };
+    const next = nextPlan[currentUser.plan];
+    if (next) upgradeNavBtn.textContent = `Upgrade to ${next} ↑`;
+  }
+
   const nudge = document.getElementById('upgradeNudge');
   const nudgeText = document.getElementById('upgradeNudgeText');
   const nudgeBtn = document.getElementById('nudgeBtn');
@@ -1784,7 +1810,15 @@ const upgradePlanLabels = {
 };
 
 function openUpgradeModal(plan) {
-  if (plan) selectUpgradePlan(plan, document.querySelector(`.upgrade-plan[data-plan="${plan}"]`));
+  // If no plan specified, pre-select the next tier up from current plan
+  if (!plan && currentUser?.plan) {
+    const nextPlan = { free: 'solo', solo: 'pro', pro: 'team' };
+    plan = nextPlan[currentUser.plan] || 'pro';
+  }
+  if (plan) {
+    const el = document.querySelector(`.upgrade-plan[data-plan="${plan}"]`);
+    selectUpgradePlan(plan, el);
+  }
   document.getElementById('upgradeModalOverlay').classList.add('open');
 }
 
