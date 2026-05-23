@@ -1022,9 +1022,9 @@
           <div class="dash-stat-change">this session</div>
         </div>
         <div class="dash-stat">
-          <div class="dash-stat-label">Free Leads Used</div>
+          <div class="dash-stat-label" id="leadsUsedLabel">Leads Used</div>
           <div class="dash-stat-value teal" id="freeLeadsUsed">0</div>
-          <div class="dash-stat-change">of 20 free leads</div>
+          <div class="dash-stat-change" id="leadsUsedSub">of 20 free leads</div>
         </div>
       </div>
 
@@ -1054,8 +1054,8 @@
                 <div class="usage-bar-fill" id="usageBar" style="width:1%"></div>
               </div>
             </div>
-            <div class="upgrade-nudge">
-              <div class="upgrade-nudge-text">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
+            <div class="upgrade-nudge" id="upgradeNudge">
+              <div class="upgrade-nudge-text" id="upgradeNudgeText">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
               <button class="upgrade-nudge-btn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
             </div>
           </div>
@@ -1295,17 +1295,42 @@ function demoLogin() {
 function loadDashboard() {
   if (!currentUser) return;
 
-  const planLimits = { solo: '500', pro: '2,000', team: '10,000' };
-  const planLabels = { solo: 'Solo · 500 leads/mo', pro: 'Pro · 2,000 leads/mo', team: 'Team · 10,000 leads · 5 Seats' };
+  const planLimits = { free: 20, solo: 500, pro: 2000, team: 10000 };
+  const planLabels = { free: 'Free · 20 leads', solo: 'Solo · 500 leads/mo', pro: 'Pro · 2,000 leads/mo', team: 'Team · 10,000 leads · 5 Seats' };
+  const planLimitDisplay = { free: '20', solo: '500', pro: '2,000', team: '10,000' };
 
   document.getElementById('dashFirstName').textContent = currentUser.firstName;
   document.getElementById('dashUserName').textContent  = currentUser.firstName + ' ' + (currentUser.lastName || '');
   document.getElementById('dashAvatar').textContent    = currentUser.firstName.charAt(0).toUpperCase();
-  document.getElementById('dashPlanBadge').textContent = planLabels[currentUser.plan] || 'Pro Plan';
+  document.getElementById('dashPlanBadge').textContent = planLabels[currentUser.plan] || 'Pro · 2,000 leads/mo';
 
-  const limit = planLimits[currentUser.plan] || 500;
-  document.getElementById('statLimit').textContent = limit;
-  document.getElementById('usageNums').textContent = `0 / ${limit} leads`;
+  const limit = planLimits[currentUser.plan] || 20;
+  const limitDisplay = planLimitDisplay[currentUser.plan] || '20';
+  const leadsUsed = currentUser.leadsUsed || 0;
+  const pct = Math.min(Math.round((leadsUsed / limit) * 100), 100);
+  const isPaid = currentUser.plan && currentUser.plan !== 'free';
+
+  // Stat cards
+  document.getElementById('statLimit').textContent = limitDisplay;
+  document.getElementById('freeLeadsUsed').textContent = leadsUsed;
+  document.getElementById('leadsUsedLabel').textContent = isPaid ? 'Leads Used This Month' : 'Free Leads Used';
+  document.getElementById('leadsUsedSub').textContent = `of ${limitDisplay} ${isPaid ? 'leads/mo' : 'free leads'}`;
+
+  // Usage bar
+  document.getElementById('usageNums').textContent = `${leadsUsed} / ${limitDisplay} leads`;
+  document.getElementById('usageBar').style.width = Math.max(pct, 1) + '%';
+
+  // Upgrade nudge — hide it for paid plans, show for free
+  const nudge = document.getElementById('upgradeNudge');
+  if (nudge) {
+    if (isPaid) {
+      nudge.style.display = 'none';
+    } else {
+      nudge.style.display = '';
+      document.getElementById('upgradeNudgeText').innerHTML =
+        `You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.`;
+    }
+  }
 }
 
 async function handleLogout() {
