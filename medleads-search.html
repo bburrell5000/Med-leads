@@ -1222,67 +1222,49 @@ function escHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Auto-search if URL has params
+// ── URL PARAM HANDLING ──
 const urlParams = new URLSearchParams(window.location.search);
-const cachedId = urlParams.get('cached');
+const cachedSearchId = urlParams.get('cached_id');
+const cachedEmail = urlParams.get('cached_email');
+const specParam = urlParams.get('specialty') || '';
+const cityParam = urlParams.get('city') || '';
 
-if (cachedId) {
-  // Load from sessionStorage cache — no Apify call, no lead credits used
-  const raw = sessionStorage.getItem('ml_cached_results');
-  if (raw) {
+// Always populate inputs from URL params
+if (specParam) {
+  document.getElementById('navSpecialty').value = specParam;
+  const fsEl = document.getElementById('filterSpecialty');
+  if (fsEl) fsEl.value = specParam;
+}
+if (cityParam) {
+  document.getElementById('navCity').value = cityParam;
+  const flocEl = document.getElementById('filterState');
+  if (flocEl) flocEl.value = cityParam;
+}
+
+if (cachedSearchId && cachedEmail) {
+  // Load saved results from backend — no Apify, no credits used
+  (async () => {
     try {
-      const cached = JSON.parse(raw);
-      if (String(cached.id) === String(cachedId)) {
-        const spec = cached.specialty || '';
-        const loc = cached.location || '';
-        if (spec) {
-          document.getElementById('navSpecialty').value = spec;
-          const fsEl = document.getElementById('filterSpecialty');
-          if (fsEl) fsEl.value = spec;
-        }
-        if (loc) {
-          document.getElementById('navCity').value = loc;
-          const flocEl = document.getElementById('filterState');
-          if (flocEl) flocEl.value = loc;
-        }
-        currentResults = cached.results || [];
+      showLoading();
+      showToast('Loading your saved results…');
+      const res = await fetch(`${BACKEND}/my-searches/${cachedSearchId}?email=${encodeURIComponent(cachedEmail)}`);
+      const data = await res.json();
+      if (data.search?.results) {
+        currentResults = data.search.results;
         updatePills();
-
-        // Show a banner indicating these are cached results
-        setTimeout(() => {
-          renderApifyResults(currentResults);
-          // Add cached notice under the subtitle
-          const sub = document.getElementById('resultsSub');
-          if (sub) {
-            sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:10px">📁 Loaded from saved history</span>';
-          }
-          showToast('Loaded from saved search — no credits used ✓');
-        }, 300);
-        sessionStorage.removeItem('ml_cached_results'); // clean up
+        renderApifyResults(currentResults);
+        const sub = document.getElementById('resultsSub');
+        if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:10px">📁 Loaded from saved history</span>';
+        showToast('Loaded from saved history — no credits used ✓');
       } else {
-        // ID mismatch — fall through to normal search
         doSearch();
       }
     } catch(e) {
       doSearch();
     }
-  } else {
-    doSearch();
-  }
-} else if (urlParams.get('specialty') || urlParams.get('city')) {
-  const spec = urlParams.get('specialty') || '';
-  const city = urlParams.get('city') || '';
-  if (spec) {
-    document.getElementById('navSpecialty').value = spec;
-    const fsEl = document.getElementById('filterSpecialty');
-    if (fsEl) fsEl.value = spec;
-  }
-  if (city) {
-    document.getElementById('navCity').value = city;
-    const flocEl = document.getElementById('filterState');
-    if (flocEl) flocEl.value = city;
-  }
-  setTimeout(() => doSearch(), 500);
+  })();
+} else if (specParam || cityParam) {
+  setTimeout(() => doSearch(), 300);
 }
 </script>
 </body>

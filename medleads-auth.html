@@ -1442,27 +1442,15 @@ async function loadSavedSearch(id, specialty, location) {
   if (!currentUser?.email) return;
   try {
     showToast('Loading saved results…');
-    const res = await fetch(`${BACKEND}/my-searches/${id}?email=${encodeURIComponent(currentUser.email)}`);
-    const data = await res.json();
-    if (!data.search?.results) {
-      showToast('Could not load saved results');
-      return;
-    }
-    // Store results in sessionStorage so search page can pick them up
-    sessionStorage.setItem('ml_cached_results', JSON.stringify({
-      id,
-      specialty,
-      location,
-      results: data.search.results,
-      cached: true
-    }));
+    // Pass the search ID and email directly in the URL — search page fetches from backend
     const params = new URLSearchParams();
     if (specialty) params.set('specialty', specialty);
     if (location) params.set('city', location);
-    params.set('cached', id);
+    params.set('cached_id', id);
+    params.set('cached_email', currentUser.email);
     window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
   } catch(e) {
-    showToast('Could not load saved results');
+    showToast('Could not open saved results');
   }
 }
 
