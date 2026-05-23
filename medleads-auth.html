@@ -1357,7 +1357,7 @@
 </div>
 
 <script>
-console.log('medleads-auth version: 2026-05-23-v3');
+console.log('medleads-auth version: 2026-05-23-v4');
 // -- SUPABASE --
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
@@ -1779,7 +1779,12 @@ async function deleteSearch(id, btn) {
 }
 
 function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  var s = String(str);
+  s = s.split('&').join('&amp;');
+  s = s.split('<').join('&lt;');
+  s = s.split('>').join('&gt;');
+  s = s.split('"').join('&quot;');
+  return s;
 }
 
 // -- UPGRADE MODAL --
