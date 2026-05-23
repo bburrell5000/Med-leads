@@ -758,6 +758,74 @@
     color: var(--muted);
   }
   .history-btn-secondary:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── UPGRADE MODAL ── */
+  .upgrade-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  .upgrade-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .upgrade-modal {
+    background: var(--navy-2); border: 1px solid var(--line);
+    border-radius: 16px; padding: 40px; max-width: 520px; width: 100%;
+    transform: translateY(20px); transition: transform .25s;
+  }
+  .upgrade-modal-overlay.open .upgrade-modal { transform: translateY(0); }
+
+  .upgrade-modal-title {
+    font-family: 'DM Serif Display', serif; font-size: 26px;
+    margin-bottom: 8px;
+  }
+  .upgrade-modal-sub {
+    font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.5;
+  }
+
+  .upgrade-plans {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+  .upgrade-plan {
+    background: var(--navy-3); border: 2px solid var(--line);
+    border-radius: 10px; padding: 16px 12px; text-align: center;
+    cursor: pointer; transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .upgrade-plan:hover { border-color: var(--teal-bdr); }
+  .upgrade-plan.selected { border-color: var(--teal); background: var(--teal-dim); }
+  .upgrade-plan-badge {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: var(--navy);
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+  }
+  .upgrade-plan-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .upgrade-plan-price { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); }
+  .upgrade-plan-price sup { font-size: 14px; vertical-align: super; }
+  .upgrade-plan-leads { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  .upgrade-perks { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .upgrade-perk {
+    font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px;
+  }
+  .upgrade-perk::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+
+  .upgrade-cta {
+    width: 100%; background: var(--teal); color: var(--navy);
+    border: none; border-radius: 10px; padding: 16px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity .2s; margin-bottom: 10px;
+  }
+  .upgrade-cta:hover { opacity: .88; }
+  .upgrade-cta:disabled { opacity: .5; cursor: not-allowed; }
+  .upgrade-close {
+    width: 100%; background: transparent; border: none; color: var(--muted);
+    font-size: 13px; cursor: pointer; padding: 8px;
+  }
+  .upgrade-close:hover { color: var(--white); }
 </style>
 </head>
 <body>
@@ -1221,7 +1289,7 @@
             <div class="upgrade-nudge" id="upgradeNudge">
               <div class="upgrade-nudge-text" id="upgradeNudgeText">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="upgrade-nudge-btn" id="nudgeBtn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
+                <button class="upgrade-nudge-btn" id="nudgeBtn" onclick="openUpgradeModal()">Upgrade Plan →</button>
                 <button class="upgrade-nudge-btn" id="nudgeFreeBtn" onclick="window.location.href='medleads-search.html'" style="background:transparent;border:1px solid var(--line);color:var(--muted);display:none">Use Free Leads →</button>
               </div>
             </div>
@@ -1238,6 +1306,40 @@
           <div class="history-title">Previous Searches <span id="historyCount"></span></div>
           <div class="history-grid" id="historyGrid"></div>
         </div>
+
+<!-- UPGRADE MODAL -->
+<div class="upgrade-modal-overlay" id="upgradeModalOverlay" onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="upgrade-modal">
+    <div class="upgrade-modal-title">Upgrade MedLeads</div>
+    <div class="upgrade-modal-sub">You've used your free leads. Upgrade to keep finding verified physician contacts.</div>
+    <div class="upgrade-plans">
+      <div class="upgrade-plan" data-plan="solo" onclick="selectUpgradePlan('solo',this)">
+        <div class="upgrade-plan-name">Solo</div>
+        <div class="upgrade-plan-price"><sup>$</sup>79</div>
+        <div class="upgrade-plan-leads">500 leads/mo</div>
+      </div>
+      <div class="upgrade-plan selected" data-plan="pro" onclick="selectUpgradePlan('pro',this)">
+        <div class="upgrade-plan-badge">Most Popular</div>
+        <div class="upgrade-plan-name">Pro</div>
+        <div class="upgrade-plan-price"><sup>$</sup>179</div>
+        <div class="upgrade-plan-leads">2,000 leads/mo</div>
+      </div>
+      <div class="upgrade-plan" data-plan="team" onclick="selectUpgradePlan('team',this)">
+        <div class="upgrade-plan-name">Team</div>
+        <div class="upgrade-plan-price"><sup>$</sup>399</div>
+        <div class="upgrade-plan-leads">10,000 leads · 5 seats</div>
+      </div>
+    </div>
+    <div class="upgrade-perks">
+      <div class="upgrade-perk">Verified physician emails + phone numbers</div>
+      <div class="upgrade-perk">All 62 specialties and sub-specialties</div>
+      <div class="upgrade-perk">CSV export + search history saved</div>
+      <div class="upgrade-perk">Cancel anytime — no contracts</div>
+    </div>
+    <button class="upgrade-cta" id="upgradeCtaBtn" onclick="startUpgrade()">Upgrade to Pro — $179/mo →</button>
+    <button class="upgrade-close" onclick="closeUpgradeModal()">Maybe later</button>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
@@ -1273,6 +1375,7 @@ async function checkSupabaseSession() {
     loadDashboard();
 
     const urlQ = new URLSearchParams(window.location.search).get('q');
+    const urlUpgrade = new URLSearchParams(window.location.search).get('upgrade');
     if (urlQ) {
       const params = new URLSearchParams();
       const inMatch = urlQ.match(/^(.+?)\s+in\s+(.+)$/i);
@@ -1288,6 +1391,10 @@ async function checkSupabaseSession() {
       }, 800);
     } else {
       showPage('page-dashboard');
+      // Auto-open upgrade modal if redirected from upgrade wall
+      if (urlUpgrade) {
+        setTimeout(() => openUpgradeModal(urlUpgrade), 400);
+      }
     }
   }
 }
@@ -1548,7 +1655,34 @@ function loadDashboard() {
   document.getElementById('usageBar').style.width = Math.max(pct, 1) + '%';
 
   const nudge = document.getElementById('upgradeNudge');
-  if (nudge) nudge.style.display = isPaid ? 'none' : '';
+  const nudgeText = document.getElementById('upgradeNudgeText');
+  const nudgeBtn = document.getElementById('nudgeBtn');
+  const nudgeFreeBtn = document.getElementById('nudgeFreeBtn');
+
+  if (nudge) {
+    if (isPaid) {
+      nudge.style.display = 'none';
+    } else {
+      nudge.style.display = '';
+      const remaining = Math.max(0, limit - leadsUsed);
+      if (leadsUsed === 0) {
+        // Brand new user — encourage them to try free OR upgrade
+        nudgeText.innerHTML = `Start with <strong>${limit} free leads</strong> — or upgrade now for 500–10,000 verified physician contacts per month.`;
+        if (nudgeBtn) nudgeBtn.textContent = 'View Upgrade Plans →';
+        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Try Free Leads First →'; }
+      } else if (remaining > 0) {
+        // Has used some but still has leads left
+        nudgeText.innerHTML = `You have <strong>${remaining} free lead${remaining !== 1 ? 's' : ''} remaining</strong>. Upgrade anytime for 500–10,000 leads/month.`;
+        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Plan →';
+        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Keep Searching →'; }
+      } else {
+        // Used all free leads
+        nudgeText.innerHTML = `You've used all <strong>${limit} free leads</strong>. Upgrade to keep finding verified physician contacts.`;
+        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Now →';
+        if (nudgeFreeBtn) nudgeFreeBtn.style.display = 'none';
+      }
+    }
+  }
 
   // Load search history
   loadSearchHistory();
@@ -1639,6 +1773,60 @@ async function deleteSearch(id, btn) {
 
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── UPGRADE MODAL ──
+let selectedUpgradePlan = 'pro';
+const upgradePlanLabels = {
+  solo: 'Solo — $79/mo',
+  pro: 'Pro — $179/mo',
+  team: 'Team — $399/mo'
+};
+
+function openUpgradeModal(plan) {
+  if (plan) selectUpgradePlan(plan, document.querySelector(`.upgrade-plan[data-plan="${plan}"]`));
+  document.getElementById('upgradeModalOverlay').classList.add('open');
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModalOverlay').classList.remove('open');
+}
+
+function selectUpgradePlan(plan, el) {
+  selectedUpgradePlan = plan;
+  document.querySelectorAll('.upgrade-plan').forEach(p => p.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const btn = document.getElementById('upgradeCtaBtn');
+  if (btn) btn.textContent = `Upgrade to ${upgradePlanLabels[plan]} →`;
+}
+
+async function startUpgrade() {
+  if (!currentUser?.email) {
+    showToast('Please sign in first');
+    return;
+  }
+  const btn = document.getElementById('upgradeCtaBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout…';
+  try {
+    const res = await fetch(`${BACKEND}/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: selectedUpgradePlan, email: currentUser.email })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      showToast('Error: ' + (data.error || 'Something went wrong'));
+      btn.disabled = false;
+      btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
+    }
+  } catch(e) {
+    showToast('Connection error — try again');
+    btn.disabled = false;
+    btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
+  }
 }
 
 async function handleLogout() {
