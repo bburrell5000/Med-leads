@@ -727,7 +727,7 @@ function renderApifyResults(results) {
   const city = document.getElementById('navCity').value.trim();
 
   document.getElementById('resultsTitle').textContent = `${specialty || 'Physicians'} · ${city || 'All locations'}`;
-  const requestedLimit = parseInt(params?.limit || 20);
+  const requestedLimit = parseInt(document.getElementById('filterLimit')?.value || 20);
     const dedupNote = results.length < requestedLimit
       ? ` · <span style="color:var(--muted);font-size:11px">${requestedLimit - results.length} duplicates removed for clean data</span>`
       : '';
