@@ -1293,47 +1293,49 @@ function escHtml(str) {
 }
 
 // ── URL PARAM HANDLING ──
-const urlParams = new URLSearchParams(window.location.search);
-const cachedSearchId = urlParams.get('cached_id');
-const cachedEmail = urlParams.get('cached_email');
-const specParam = urlParams.get('specialty') || '';
-const cityParam = urlParams.get('city') || '';
+window.addEventListener('load', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const cachedSearchId = urlParams.get('cached_id');
+  const cachedEmail = urlParams.get('cached_email');
+  const specParam = urlParams.get('specialty') || '';
+  const cityParam = urlParams.get('city') || '';
 
-// Populate sidebar inputs from URL params
-if (specParam) {
-  const fsEl = document.getElementById('filterSpecialty');
-  if (fsEl) fsEl.value = specParam;
-}
-if (cityParam) {
-  const flocEl = document.getElementById('filterState');
-  if (flocEl) flocEl.value = cityParam;
-}
+  // Populate sidebar inputs from URL params
+  if (specParam) {
+    const fsEl = document.getElementById('filterSpecialty');
+    if (fsEl) fsEl.value = specParam;
+  }
+  if (cityParam) {
+    const flocEl = document.getElementById('filterState');
+    if (flocEl) flocEl.value = cityParam;
+  }
 
-if (cachedSearchId && cachedEmail) {
-  // Load saved results from backend — no Apify, no credits used
-  (async () => {
-    try {
-      showLoading();
-      showToast('Loading your saved results…');
-      const res = await fetch(`${BACKEND}/my-searches/${cachedSearchId}?email=${encodeURIComponent(cachedEmail)}`);
-      const data = await res.json();
-      if (data.search?.results) {
-        currentResults = data.search.results;
-        updatePills();
-        renderApifyResults(currentResults);
-        const sub = document.getElementById('resultsSub');
-        if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
-        showToast('Loaded from saved history — no credits used ✓');
-      } else {
+  if (cachedSearchId && cachedEmail) {
+    // Load saved results from backend — no Apify, no credits used
+    (async () => {
+      try {
+        showLoading();
+        showToast('Loading your saved results…');
+        const res = await fetch(`${BACKEND}/my-searches/${cachedSearchId}?email=${encodeURIComponent(cachedEmail)}`);
+        const data = await res.json();
+        if (data.search?.results) {
+          currentResults = data.search.results;
+          updatePills();
+          renderApifyResults(currentResults);
+          const sub = document.getElementById('resultsSub');
+          if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
+          showToast('Loaded from saved history — no credits used ✓');
+        } else {
+          doSearch();
+        }
+      } catch(e) {
         doSearch();
       }
-    } catch(e) {
-      doSearch();
-    }
-  })();
-} else if (specParam || cityParam) {
-  setTimeout(() => doSearch(), 300);
-}
+    })();
+  } else if (specParam || cityParam) {
+    setTimeout(() => doSearch(), 300);
+  }
+});
 </script>
 </body>
 </html>
