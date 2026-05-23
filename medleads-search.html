@@ -1088,17 +1088,16 @@ function updatePills() {
   const container = document.getElementById('activePills');
   container.innerHTML = '';
 
-  const spec = document.getElementById('navSpecialty');
-  const city = document.getElementById('navCity').value.trim();
-  const state = document.getElementById('filterState').value;
-  const ln = document.getElementById('filterLastName').value.trim();
-  const gender = document.getElementById('filterGender').value;
+  const specEl = document.getElementById('navSpecialty');
+  const specText = specEl ? (specEl.value || '').trim() : '';
+  const city = (document.getElementById('navCity') || {value:''}).value.trim();
+  const state = (document.getElementById('filterState') || {value:''}).value.trim();
+  const specialty = (document.getElementById('filterSpecialty') || {value:''}).value.trim();
 
-  if (spec.value) addPill(container, SPECIALTY_NAMES[spec.value] || spec.value, () => { spec.value = ''; doSearch(); });
-  if (city)  addPill(container, city, () => { document.getElementById('navCity').value = ''; doSearch(); });
+  if (specText) addPill(container, specText, () => { if(specEl) specEl.value = ''; doSearch(); });
+  if (city) addPill(container, city, () => { document.getElementById('navCity').value = ''; doSearch(); });
   if (state) addPill(container, state, () => { document.getElementById('filterState').value = ''; doSearch(); });
-  if (ln)    addPill(container, 'Last: ' + ln, () => { document.getElementById('filterLastName').value = ''; doSearch(); });
-  if (gender) addPill(container, gender === 'M' ? 'Male' : 'Female', () => { document.getElementById('filterGender').value = ''; doSearch(); });
+  if (specialty) addPill(container, specialty, () => { document.getElementById('filterSpecialty').value = ''; doSearch(); });
 }
 
 function addPill(container, text, onRemove) {
@@ -1154,10 +1153,10 @@ document.getElementById('applyFilters').addEventListener('click', () => doSearch
 document.getElementById('resetFilters').addEventListener('click', () => {
   document.getElementById('navSpecialty').value = '';
   document.getElementById('navCity').value = '';
-  document.getElementById('filterState').value = '';
-  document.getElementById('filterLastName').value = '';
-  document.getElementById('filterGender').value = '';
-  document.getElementById('filterType').value = '1';
+  const fsEl = document.getElementById('filterState');
+  const fspEl = document.getElementById('filterSpecialty');
+  if (fsEl) fsEl.value = '';
+  if (fspEl) fspEl.value = '';
   document.getElementById('filterLimit').value = '20';
   currentResults = []; currentSkip = 0; currentPage = 1;
   document.getElementById('activePills').innerHTML = '';
