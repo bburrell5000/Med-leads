@@ -1374,7 +1374,8 @@ function escHtml(str) {
 }
 
 // ── URL PARAM HANDLING ──
-window.addEventListener('load', () => {
+// Use a small delay to ensure all functions and constants are ready
+setTimeout(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const cachedSearchId = urlParams.get('cached_id');
   const cachedEmail = urlParams.get('cached_email');
@@ -1396,27 +1397,32 @@ window.addEventListener('load', () => {
     (async () => {
       try {
         showLoading();
-        showToast('Loading your saved results…');
-        const res = await fetch(`${BACKEND}/my-searches/${cachedSearchId}?email=${encodeURIComponent(cachedEmail)}`);
+        showToast('Loading your saved results...');
+        const backendUrl = 'https://medleads-backend-production.up.railway.app';
+        const res = await fetch(`${backendUrl}/my-searches/${encodeURIComponent(cachedSearchId)}?email=${encodeURIComponent(cachedEmail)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (data.search?.results) {
-          currentResults = data.search.results;
+        if (data.search?.results && data.search.results.length > 0) {
+          currentResults = typeof data.search.results === 'string'
+            ? JSON.parse(data.search.results)
+            : data.search.results;
           updatePills();
           renderApifyResults(currentResults);
           const sub = document.getElementById('resultsSub');
-          if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
-          showToast('Loaded from saved history — no credits used ✓');
+          if (sub) sub.innerHTML += ' &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
+          showToast('Loaded from saved history - no credits used');
         } else {
-          doSearch();
+          showState('&#128269;', 'No saved results found', 'The saved search may have expired. Try searching again.');
         }
       } catch(e) {
-        doSearch();
+        console.error('Failed to load saved search:', e);
+        showState('&#9888;', 'Could not load saved results', 'Please try searching again.');
       }
     })();
   } else if (specParam || cityParam) {
     setTimeout(() => doSearch(), 300);
   }
-});
+}, 500);
 </script>
 </body>
 </html>
