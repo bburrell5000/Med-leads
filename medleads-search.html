@@ -586,7 +586,7 @@
     <div class="filter-group">
       <div class="filter-label">Number of Leads</div>
       <div class="lead-stepper">
-        <button class="stepper-btn" id="stepDown" type="button">−</button>
+        <button class="stepper-btn" id="stepDown" type="button" onclick="stepLeads(-1)">−</button>
         <input
           type="number"
           class="stepper-input"
@@ -597,7 +597,7 @@
           step="1"
           placeholder="20"
         >
-        <button class="stepper-btn" id="stepUp" type="button">+</button>
+        <button class="stepper-btn" id="stepUp" type="button" onclick="stepLeads(1)">+</button>
       </div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px">Enter or use arrows · max 100</div>
     </div>
@@ -693,30 +693,23 @@ const SPECIALTY_NAMES = {
 const BACKEND = 'https://medleads-backend-production.up.railway.app';
 
 // Clamp lead count input between 1 and 100
-document.addEventListener('DOMContentLoaded', () => {
-  const limitInput = document.getElementById('filterLimit');
-  if (limitInput) {
-    function clampLimit() {
-      let v = parseInt(limitInput.value) || 20;
-      if (v < 1) v = 1;
-      if (v > 100) v = 100;
-      limitInput.value = v;
-    }
-    limitInput.addEventListener('blur', clampLimit);
-    limitInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { clampLimit(); doSearch(); }
-    });
+// ── LEAD STEPPER ──
+function stepLeads(delta) {
+  const input = document.getElementById('filterLimit');
+  let v = parseInt(input.value) || 20;
+  v = Math.min(100, Math.max(1, v + delta));
+  input.value = v;
+}
 
-    // Custom stepper buttons
-    document.getElementById('stepDown').addEventListener('click', () => {
-      let v = parseInt(limitInput.value) || 20;
-      limitInput.value = Math.max(1, v - 1);
-    });
-    document.getElementById('stepUp').addEventListener('click', () => {
-      let v = parseInt(limitInput.value) || 20;
-      limitInput.value = Math.min(100, v + 1);
-    });
-  }
+// Clamp on blur + Enter triggers search
+document.getElementById('filterLimit').addEventListener('blur', () => {
+  let v = parseInt(document.getElementById('filterLimit').value) || 20;
+  if (v < 1) v = 1;
+  if (v > 100) v = 100;
+  document.getElementById('filterLimit').value = v;
+});
+document.getElementById('filterLimit').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doSearch();
 });
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
