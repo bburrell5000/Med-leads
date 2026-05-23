@@ -687,22 +687,13 @@ function showUpgradeWall(data) {
 }
 
 function buildParams() {
-  // Nav specialty dropdown value (text-based option text, not taxonomy code)
-  const navSpecEl = document.getElementById('navSpecialty');
-  const navSpecValue = navSpecEl ? navSpecEl.options[navSpecEl.selectedIndex]?.text : '';
-  const navSpecClean = (navSpecValue === 'All Specialties' || !navSpecValue) ? '' : navSpecValue;
-  
-  // Sidebar specialty text input
+  const navSpec = (document.getElementById('navSpecialty') || {value:''}).value.trim();
   const sidebarSpec = (document.getElementById('filterSpecialty') || {value:''}).value.trim();
-  
-  // Nav city field
   const navCity = (document.getElementById('navCity') || {value:''}).value.trim();
-  
-  // Sidebar location
   const sidebarLoc = (document.getElementById('filterState') || {value:''}).value.trim();
 
   return {
-    specialty: navSpecClean || sidebarSpec || '',
+    specialty: navSpec || sidebarSpec || '',
     location: navCity || sidebarLoc || '',
     limit: (document.getElementById('filterLimit') || {value:'20'}).value || '20',
   };
@@ -1193,15 +1184,33 @@ function showToast(msg) {
 }
 
 // ── EVENTS ──
-document.getElementById('navSearchBtn').addEventListener('click', () => doSearch());
-document.getElementById('navCity').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-document.getElementById('applyFilters').addEventListener('click', () => doSearch());
+document.getElementById('navSearchBtn').addEventListener('click', () => {
+  // Sync nav values to sidebar before searching
+  const navSpec = document.getElementById('navSpecialty').value.trim();
+  const navCity = document.getElementById('navCity').value.trim();
+  const fsEl = document.getElementById('filterSpecialty');
+  const flocEl = document.getElementById('filterState');
+  if (navSpec && fsEl) fsEl.value = navSpec;
+  if (navCity && flocEl) flocEl.value = navCity;
+  doSearch();
+});
 
-// Also trigger search on Enter in sidebar fields
+document.getElementById('navSpecialty').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('navSearchBtn').click(); });
+document.getElementById('navCity').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('navSearchBtn').click(); });
+
+document.getElementById('applyFilters').addEventListener('click', () => {
+  // Sync sidebar values to nav before searching
+  const fsEl = document.getElementById('filterSpecialty');
+  const flocEl = document.getElementById('filterState');
+  if (fsEl?.value) document.getElementById('navSpecialty').value = fsEl.value;
+  if (flocEl?.value) document.getElementById('navCity').value = flocEl.value;
+  doSearch();
+});
+
 const filterSpecEl = document.getElementById('filterSpecialty');
 const filterStateEl = document.getElementById('filterState');
-if (filterSpecEl) filterSpecEl.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-if (filterStateEl) filterStateEl.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+if (filterSpecEl) filterSpecEl.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('applyFilters').click(); });
+if (filterStateEl) filterStateEl.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('applyFilters').click(); });
 
 document.getElementById('resetFilters').addEventListener('click', () => {
   document.getElementById('navSpecialty').value = '';
@@ -1226,9 +1235,19 @@ function escHtml(str) {
 // Auto-search if URL has params (future use)
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('specialty') || urlParams.get('city')) {
-  if (urlParams.get('specialty')) document.getElementById('navSpecialty').value = urlParams.get('specialty');
-  if (urlParams.get('city'))     document.getElementById('navCity').value = urlParams.get('city');
-  doSearch();
+  const spec = urlParams.get('specialty') || '';
+  const city = urlParams.get('city') || '';
+  if (spec) {
+    document.getElementById('navSpecialty').value = spec;
+    const fsEl = document.getElementById('filterSpecialty');
+    if (fsEl) fsEl.value = spec;
+  }
+  if (city) {
+    document.getElementById('navCity').value = city;
+    const flocEl = document.getElementById('filterState');
+    if (flocEl) flocEl.value = city;
+  }
+  setTimeout(() => doSearch(), 500); // small delay to let page load
 }
 </script>
 </body>
