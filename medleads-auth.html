@@ -732,10 +732,10 @@
 <div class="page active" id="page-paywall">
   <div class="paywall-page auth-page" style="flex-direction:column;align-items:center;justify-content:center;">
     <div class="paywall-card">
-      <div class="paywall-lock">🔒</div>
-      <div class="paywall-eyebrow">20 free leads used</div>
-      <div class="paywall-title">You've used your <em>20 free leads.</em><br>Upgrade to keep going.</div>
-      <div class="paywall-sub">You've seen what MedLeads can do. Upgrade to get hundreds or thousands of verified clinic emails for your full territory.</div>
+      <div class="paywall-lock" id="paywallIcon">🔍</div>
+      <div class="paywall-eyebrow" id="paywallEyebrow">Free · No credit card required</div>
+      <div class="paywall-title" id="paywallTitle">Get your <em>20 free leads</em><br>— start searching now.</div>
+      <div class="paywall-sub" id="paywallSub">Sign in with Google or create a free account to instantly search physician leads including emails, phone numbers, and Google ratings.</div>
 
       <!-- Blurred preview -->
       <div class="paywall-preview">
@@ -1116,7 +1116,10 @@
             </div>
             <div class="upgrade-nudge" id="upgradeNudge">
               <div class="upgrade-nudge-text" id="upgradeNudgeText">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
-              <button class="upgrade-nudge-btn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="upgrade-nudge-btn" id="nudgeBtn" onclick="showToast('Upgrade flow coming soon!')">Upgrade Plan →</button>
+                <button class="upgrade-nudge-btn" id="nudgeFreeBtn" onclick="window.location.href='medleads-search.html'" style="background:transparent;border:1px solid var(--line);color:var(--muted);display:none">Use Free Leads →</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1164,7 +1167,24 @@ async function checkSupabaseSession() {
       currentUser.leadsLimit = data.leads_limit || 20;
     } catch(e) {}
     loadDashboard();
-    showPage('page-dashboard');
+
+    const urlQ = new URLSearchParams(window.location.search).get('q');
+    if (urlQ) {
+      const params = new URLSearchParams();
+      const inMatch = urlQ.match(/^(.+?)\s+in\s+(.+)$/i);
+      if (inMatch) {
+        params.set('specialty', inMatch[1].trim());
+        params.set('city', inMatch[2].trim());
+      } else {
+        params.set('specialty', urlQ);
+      }
+      showToast(`Welcome back, ${currentUser.firstName}! Taking you to your search…`);
+      setTimeout(() => {
+        window.location.href = 'medleads-search.html?' + params.toString();
+      }, 800);
+    } else {
+      showPage('page-dashboard');
+    }
   }
 }
 
@@ -1197,13 +1217,52 @@ sb.auth.onAuthStateChange(async (event, session) => {
       currentUser.leadsLimit = data.leads_limit || 20;
     } catch(e) {}
     loadDashboard();
-    showPage('page-dashboard');
-    showToast(`Welcome, ${currentUser.firstName}! 🎉`);
+
+    // If user came from homepage with a search query, send them straight to search
+    const urlQ = new URLSearchParams(window.location.search).get('q');
+    if (urlQ) {
+      const params = new URLSearchParams();
+      // Parse "Cardiologists in Miami, Florida" style queries
+      const inMatch = urlQ.match(/^(.+?)\s+in\s+(.+)$/i);
+      if (inMatch) {
+        params.set('specialty', inMatch[1].trim());
+        params.set('city', inMatch[2].trim());
+      } else {
+        params.set('specialty', urlQ);
+      }
+      showToast(`Welcome, ${currentUser.firstName}! Taking you to your search… 🎉`);
+      setTimeout(() => {
+        window.location.href = 'medleads-search.html?' + params.toString();
+      }, 800);
+    } else {
+      showPage('page-dashboard');
+      showToast(`Welcome, ${currentUser.firstName}! 🎉`);
+    }
   }
 });
 
 // ── BACKEND ──
-const BACKEND = 'https://medleads-backend-production.up.railway.app'; // update after Railway deploy
+const BACKEND = 'https://medleads-backend-production.up.railway.app';
+
+// ── LANDING PAGE ENTRY POINT ──
+// If visitor came from homepage, show sign-up page instead of upgrade wall
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('signup') === '1' || p.get('q')) {
+    // Swap messaging to welcome tone
+    const icon = document.getElementById('paywallIcon');
+    const eyebrow = document.getElementById('paywallEyebrow');
+    const title = document.getElementById('paywallTitle');
+    const sub = document.getElementById('paywallSub');
+    const q = p.get('q');
+    if (icon) icon.textContent = '🔍';
+    if (eyebrow) eyebrow.textContent = 'Free · No credit card required';
+    if (title) title.innerHTML = q
+      ? `Search <em>${q}</em><br>— sign in to get your 20 free leads.`
+      : 'Get your <em>20 free leads</em><br>— start searching now.';
+    if (sub) sub.textContent = 'Create a free account to instantly search physician leads including emails, phone numbers, and Google ratings. No credit card needed.';
+  }
+})();
 
 // ── STATE ──
 let currentUser = null;

@@ -898,10 +898,14 @@
 
   <div class="search-wrap">
     <input class="search-input" type="text" id="heroSearch" placeholder="e.g. Family physicians in Phoenix, Arizona" style="flex:1">
-    <button class="search-btn" id="heroBtn">Search Leads →</button>
+    <button class="search-btn" id="heroBtn">Get Free Leads →</button>
   </div>
 
-  <p class="hero-hint">Try: <span>Cardiologists in Miami, Florida</span> · <span>Orthopedic Surgeons in Dallas, Texas</span></p>
+  <p class="hero-hint" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <span>🔒 Sign in for 20 free leads — no credit card</span>
+    <span style="color:var(--line)">|</span>
+    <span>Try: <span style="color:var(--teal)">Cardiologists in Miami</span> · <span style="color:var(--teal)">Orthopedic Surgeons in Dallas</span></span>
+  </p>
 </section>
 
 <!-- TICKER -->
@@ -1200,12 +1204,17 @@
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // Search interaction
-  document.getElementById('heroBtn').addEventListener('click', () => {
-    window.location.href = 'medleads-auth.html';
-  });
+  // Search interaction — pass query to auth page
+  function goToSearch() {
+    const query = document.getElementById('heroSearch').value.trim();
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    params.set('signup', '1'); // hint to auth page: show sign-up first
+    window.location.href = 'medleads-auth.html?' + params.toString();
+  }
+  document.getElementById('heroBtn').addEventListener('click', goToSearch);
   document.getElementById('heroSearch').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') window.location.href = 'medleads-auth.html';
+    if (e.key === 'Enter') goToSearch();
   });
 </script>
 </body>
