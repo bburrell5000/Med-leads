@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedLeads — Sign Up</title>
+<title>MedLeads  -  Sign Up</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -162,7 +162,7 @@
   .testimonial-name { font-size: 13px; font-weight: 600; }
   .testimonial-role { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); }
 
-  /* Right panel — form */
+  /* Right panel  -  form */
   .auth-right {
     flex: 1;
     display: flex;
@@ -853,13 +853,13 @@
     <div class="paywall-card">
       <div class="paywall-lock" id="paywallIcon">🔍</div>
       <div class="paywall-eyebrow" id="paywallEyebrow">Free · No credit card required</div>
-      <div class="paywall-title" id="paywallTitle">Get your <em>20 free leads</em><br>— start searching now.</div>
+      <div class="paywall-title" id="paywallTitle">Get your <em>20 free leads</em><br> -  start searching now.</div>
       <div class="paywall-sub" id="paywallSub">Sign in with Google or create a free account to instantly search physician leads including emails, phone numbers, and Google ratings.</div>
 
-      <!-- Blurred preview — matches real lead card layout -->
+      <!-- Blurred preview  -  matches real lead card layout -->
       <div class="paywall-preview">
 
-        <!-- Card 1: Fully visible — fictional example -->
+        <!-- Card 1: Fully visible  -  fictional example -->
         <div class="preview-card">
           <div class="preview-card-top">
             <div class="preview-left">
@@ -990,7 +990,7 @@
         <div class="perk">Unlimited lead exports on Pro & Team</div>
         <div class="perk">All 62 specialties + sub-specialties</div>
         <div class="perk">CSV export + CRM integrations</div>
-        <div class="perk">Cancel anytime — no contracts</div>
+        <div class="perk">Cancel anytime  -  no contracts</div>
       </div>
 
       <!-- Google Sign In - Primary CTA -->
@@ -1091,7 +1091,7 @@
 
         <div class="trial-notice">
           <div class="trial-notice-icon">✓</div>
-          <div class="trial-notice-text"><strong>20 free leads included</strong> — no credit card required. See real results before you pay.</div>
+          <div class="trial-notice-text"><strong>20 free leads included</strong>  -  no credit card required. See real results before you pay.</div>
         </div>
 
         <!-- Form -->
@@ -1303,7 +1303,7 @@
               </div>
             </div>
             <div class="upgrade-nudge" id="upgradeNudge">
-              <div class="upgrade-nudge-text" id="upgradeNudgeText">You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.</div>
+              <div class="upgrade-nudge-text" id="upgradeNudgeText">You get <strong>20 free leads</strong> to start. Upgrade for 500-10,000 leads/month with full email + social data.</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="upgrade-nudge-btn" id="nudgeBtn" onclick="openUpgradeModal()">Upgrade Plan →</button>
                 <button class="upgrade-nudge-btn" id="nudgeFreeBtn" onclick="window.location.href='medleads-search.html'" style="background:transparent;border:1px solid var(--line);color:var(--muted);display:none">Use Free Leads →</button>
@@ -1350,9 +1350,9 @@
       <div class="upgrade-perk">Verified physician emails + phone numbers</div>
       <div class="upgrade-perk">All 62 specialties and sub-specialties</div>
       <div class="upgrade-perk">CSV export + search history saved</div>
-      <div class="upgrade-perk">Cancel anytime — no contracts</div>
+      <div class="upgrade-perk">Cancel anytime  -  no contracts</div>
     </div>
-    <button class="upgrade-cta" id="upgradeCtaBtn" onclick="startUpgrade()">Upgrade to Pro — $179/mo →</button>
+    <button class="upgrade-cta" id="upgradeCtaBtn" onclick="startUpgrade()">Upgrade to Pro  -  $179/mo →</button>
     <button class="upgrade-close" onclick="closeUpgradeModal()">Maybe later</button>
   </div>
 </div>
@@ -1485,8 +1485,8 @@ const BACKEND = 'https://medleads-backend-production.up.railway.app';
     if (icon) icon.textContent = '🔍';
     if (eyebrow) eyebrow.textContent = 'Free · No credit card required';
     if (title) title.innerHTML = q
-      ? `Search <em>${q}</em><br>— sign in to get your 20 free leads.`
-      : 'Get your <em>20 free leads</em><br>— start searching now.';
+      ? `Search <em>${q}</em><br> -  sign in to get your 20 free leads.`
+      : 'Get your <em>20 free leads</em><br> -  start searching now.';
     if (sub) sub.textContent = 'Create a free account to instantly search physician leads including emails, phone numbers, and Google ratings. No credit card needed.';
   }
 })();
@@ -1593,7 +1593,7 @@ function handleSignup() {
   .catch(err => {
     btn.disabled = false; btn.classList.remove('loading');
     btn.textContent = 'Start Searching →';
-    showToast('Connection error — try again');
+    showToast('Connection error  -  try again');
   });
 }
 
@@ -1622,7 +1622,7 @@ function handleLogin() {
       showPage('page-dashboard');
       showToast(`Welcome back, ${user.firstName}!`);
     } else {
-      // Wrong creds — show error
+      // Wrong creds  -  show error
       const errEl = document.getElementById('err-li-pw');
       document.getElementById('li-pw').classList.add('error');
       errEl.textContent = 'Incorrect email or password';
@@ -1692,13 +1692,13 @@ function loadDashboard() {
       nudge.style.display = '';
       const remaining = Math.max(0, limit - leadsUsed);
       if (leadsUsed === 0) {
-        // Brand new user — encourage them to try free OR upgrade
-        nudgeText.innerHTML = `Start with <strong>${limit} free leads</strong> — or upgrade now for 500–10,000 verified physician contacts per month.`;
+        // Brand new user  -  encourage them to try free OR upgrade
+        nudgeText.innerHTML = `Start with <strong>${limit} free leads</strong>  -  or upgrade now for 500-10,000 verified physician contacts per month.`;
         if (nudgeBtn) nudgeBtn.textContent = 'View Upgrade Plans →';
         if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Try Free Leads First →'; }
       } else if (remaining > 0) {
         // Has used some but still has leads left
-        nudgeText.innerHTML = `You have <strong>${remaining} free lead${remaining !== 1 ? 's' : ''} remaining</strong>. Upgrade anytime for 500–10,000 leads/month.`;
+        nudgeText.innerHTML = `You have <strong>${remaining} free lead${remaining !== 1 ? 's' : ''} remaining</strong>. Upgrade anytime for 500-10,000 leads/month.`;
         if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Plan →';
         if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Keep Searching →'; }
       } else {
@@ -1727,7 +1727,7 @@ async function loadSearchHistory() {
 
     if (!searches.length) {
       section.style.display = 'block';
-      grid.innerHTML = '<div class="history-empty">No searches yet — run your first search above and it will appear here automatically.</div>';
+      grid.innerHTML = '<div class="history-empty">No searches yet  -  run your first search above and it will appear here automatically.</div>';
       countEl.textContent = '';
       return;
     }
@@ -1765,7 +1765,7 @@ async function loadSavedSearch(id, specialty, location) {
   if (!currentUser?.email) return;
   try {
     showToast('Loading saved results…');
-    // Pass the search ID and email directly in the URL — search page fetches from backend
+    // Pass the search ID and email directly in the URL  -  search page fetches from backend
     const params = new URLSearchParams();
     if (specialty) params.set('specialty', specialty);
     if (location) params.set('city', location);
@@ -1804,9 +1804,9 @@ function escHtml(str) {
 // ── UPGRADE MODAL ──
 let selectedUpgradePlan = 'pro';
 const upgradePlanLabels = {
-  solo: 'Solo — $79/mo',
-  pro: 'Pro — $179/mo',
-  team: 'Team — $399/mo'
+  solo: 'Solo  -  $79/mo',
+  pro: 'Pro  -  $179/mo',
+  team: 'Team  -  $399/mo'
 };
 
 function openUpgradeModal(plan) {
@@ -1857,7 +1857,7 @@ async function startUpgrade() {
       btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
     }
   } catch(e) {
-    showToast('Connection error — try again');
+    showToast('Connection error  -  try again');
     btn.disabled = false;
     btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
   }
