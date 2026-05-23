@@ -711,7 +711,7 @@ async function doSearch(resetPage = true) {
   updatePills();
 
   try {
-    showToast('Searching Google Maps + scraping emails... this takes ~30 seconds ⏳');
+    showToast('Searching Google Maps and scraping emails — this takes 1-2 minutes ⏳ Please wait...');
     const data = await callApify(params.specialty, params.location, params.limit);
     if (!data) return; // upgrade wall shown
     currentResults = data.results || [];
