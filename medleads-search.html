@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MedLeads — Search Results</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -638,54 +639,71 @@ const SPECIALTY_NAMES = {
 };
 
 // ── NPI API ──
-async function fetchNPI(params) {
-  const base = 'https://npiregistry.cms.hhs.gov/api/?version=2.1&';
-  const qs = Object.entries(params)
-    .filter(([_, v]) => v !== '' && v !== undefined)
-    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
-    .join('&');
-  const url = base + qs;
+// ── BACKEND + SUPABASE ──
+const BACKEND = 'https://medleads-backend-production.up.railway.app';
+const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('API error: ' + res.status);
-  return res.json();
+// Get current user email from Supabase session
+async function getCurrentUserEmail() {
+  const { data: { session } } = await sb.auth.getSession();
+  return session?.user?.email || null;
+}
+
+async function callApify(specialty, location, limit) {
+  const email = await getCurrentUserEmail();
+  const res = await fetch(`${BACKEND}/scrape-emails`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ specialty, location, limit, email })
+  });
+  const data = await res.json();
+
+  if (res.status === 403 && data.upgrade_required) {
+    // Lead limit reached
+    showUpgradeWall(data);
+    return null;
+  }
+
+  if (!res.ok) throw new Error(data.error || 'Search failed');
+  return data;
+}
+
+function showUpgradeWall(data) {
+  const container = document.getElementById('resultsContainer');
+  container.innerHTML = `
+    <div class="state-box">
+      <div class="state-icon">🔒</div>
+      <div class="state-title">You've used all ${data.limit} free leads</div>
+      <div class="state-sub">Upgrade to keep searching. Solo gets 500 leads/month, Pro gets 2,000.</div>
+      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a href="medleads-auth.html" style="background:var(--teal);color:var(--navy);padding:12px 28px;border-radius:8px;font-weight:600;text-decoration:none;font-family:'Instrument Sans',sans-serif">
+          Upgrade Plan →
+        </a>
+      </div>
+    </div>`;
+  document.getElementById('paginationBar').style.display = 'none';
 }
 
 function buildParams() {
-  const p = {
-    enumeration_type: document.getElementById('filterType').value || '1',
+  return {
+    specialty: document.getElementById('navSpecialty')?.value?.trim() || 
+               document.getElementById('filterSpecialty')?.value?.trim() || '',
+    location: document.getElementById('navCity').value.trim() ||
+              document.getElementById('filterState').value.trim() || '',
     limit: document.getElementById('filterLimit').value || '20',
-    skip: currentSkip,
   };
-
-  const spec = document.getElementById('navSpecialty').value;
-  const city = document.getElementById('navCity').value.trim();
-  const state = document.getElementById('filterState').value;
-  const lastName = document.getElementById('filterLastName').value.trim();
-  const gender = document.getElementById('filterGender').value;
-
-  if (spec)     p.taxonomy_description = spec;
-  if (city)     p.city = city;
-  if (state)    p.state = state;
-  if (lastName) p.last_name = lastName;
-  if (gender)   p.gender = gender;
-
-  return p;
 }
 
 // ── SEARCH ──
 async function doSearch(resetPage = true) {
   if (resetPage) { currentSkip = 0; currentPage = 1; }
 
-  currentParams = buildParams();
+  const params = buildParams();
 
-  // Need at least one real filter
-  const hasFilter = Object.keys(currentParams).some(k =>
-    !['enumeration_type','limit','skip'].includes(k) && currentParams[k]
-  );
-
-  if (!hasFilter) {
-    showState('🔬', 'Add a filter to search', 'Select a specialty, city, state, or last name to pull physician records from the NPI Registry.');
+  if (!params.specialty && !params.location) {
+    showState('🔬', 'Add a filter to search', 'Enter a specialty (e.g. "Cardiologists") and a city to find verified physician emails.');
     return;
   }
 
@@ -693,16 +711,136 @@ async function doSearch(resetPage = true) {
   updatePills();
 
   try {
-    const data = await fetchNPI(currentParams);
-    const results = data.results || [];
-    currentResults = results;
-    renderResults(results, data.result_count || results.length);
+    showToast('Searching Google Maps + scraping emails... this takes ~30 seconds ⏳');
+    const data = await callApify(params.specialty, params.location, params.limit);
+    if (!data) return; // upgrade wall shown
+    currentResults = data.results || [];
+
+    // Update usage display
+    if (data.usage) {
+      document.getElementById('sidebarCount').innerHTML =
+        `<strong>${data.usage.leads_remaining}</strong> leads remaining this month`;
+    }
+
+    renderApifyResults(currentResults);
   } catch (e) {
-    showState('⚠️', 'Search failed', 'Could not reach the NPI Registry. Check your connection and try again. Error: ' + e.message);
+    showState('⚠️', 'Search failed', 'Something went wrong. Try again in a moment. Error: ' + e.message);
   }
 }
 
-// ── RENDER ──
+// ── RENDER APIFY RESULTS ──
+function renderApifyResults(results) {
+  const container = document.getElementById('resultsContainer');
+
+  const specialty = document.getElementById('navSpecialty')?.value || '';
+  const city = document.getElementById('navCity').value.trim();
+
+  document.getElementById('resultsTitle').textContent = `${specialty || 'Physicians'} · ${city || 'All locations'}`;
+  document.getElementById('resultsSub').innerHTML =
+    `Showing <strong>${results.length}</strong> verified leads · Google Maps + Website Crawl`;
+  document.getElementById('sidebarCount').innerHTML = `<strong>${results.length}</strong> leads found`;
+
+  if (!results.length) {
+    showState('🔍', 'No results found', 'Try a different specialty or location. Some areas may have fewer listed practices.');
+    document.getElementById('paginationBar').style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = '';
+  const list = document.createElement('div');
+  list.className = 'results-list';
+
+  results.forEach((r, i) => {
+    const card = buildApifyCard(r, i);
+    list.appendChild(card);
+  });
+
+  container.appendChild(list);
+  document.getElementById('paginationBar').style.display = 'none'; // Apify returns all at once
+}
+
+function buildApifyCard(r, idx) {
+  const initials = r.name?.split(' ').map(w => w[0]).slice(0,2).join('') || '?';
+  const emailDisplay = r.emails?.length > 0
+    ? r.emails.join(', ')
+    : '<span style="color:var(--muted);font-size:12px">No email found</span>';
+  const ratingDisplay = r.rating ? `⭐ ${r.rating} (${r.reviews} reviews)` : '—';
+  const socialLinks = r.social?.slice(0,3).map(s => {
+    const domain = s.includes('linkedin') ? 'LinkedIn' : s.includes('facebook') ? 'Facebook' : s.includes('instagram') ? 'Instagram' : 'Social';
+    return `<a href="${escHtml(s)}" target="_blank" style="color:var(--teal);font-size:11px;font-family:'IBM Plex Mono',monospace">${domain}</a>`;
+  }).join(' · ') || '—';
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.style.animationDelay = (idx * 35) + 'ms';
+
+  card.innerHTML = `
+    <div class="card-left">
+      <div class="card-top">
+        <div class="card-avatar">${escHtml(initials)}</div>
+        <div class="card-name-block">
+          <div class="card-name">${escHtml(r.name || 'Unknown Practice')}</div>
+          <div class="card-specialty">${escHtml(r.city || '')}${r.state ? ', ' + r.state : ''}</div>
+          <div class="card-badges">
+            ${r.emails?.length > 0 ? '<span class="badge badge-verified">✓ Email Found</span>' : '<span class="badge badge-gender">No Email</span>'}
+            ${r.rating ? `<span class="badge badge-type">⭐ ${r.rating}</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-item">
+          <div class="meta-label">Email(s)</div>
+          <div class="meta-value" style="font-size:12px">${emailDisplay}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Phone</div>
+          <div class="meta-value">${escHtml(r.phone || '—')}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Social</div>
+          <div class="meta-value" style="font-size:12px">${socialLinks}</div>
+        </div>
+      </div>
+      <div class="meta-item" style="margin-top:8px">
+        <div class="meta-label">Address</div>
+        <div class="meta-value" style="font-size:12px">${escHtml(r.address || '—')}</div>
+      </div>
+      ${r.website ? `<div class="meta-item" style="margin-top:6px"><a href="${escHtml(r.website)}" target="_blank" style="color:var(--teal);font-size:12px;font-family:'IBM Plex Mono',monospace">${escHtml(r.website)}</a></div>` : ''}
+    </div>
+    <div class="card-right">
+      <div class="card-npi">${ratingDisplay}</div>
+      <button class="card-action" onclick="openApifyModal(${idx})">View Details</button>
+    </div>
+  `;
+
+  return card;
+}
+
+function openApifyModal(idx) {
+  const r = currentResults[idx];
+  if (!r) return;
+
+  document.getElementById('modalName').textContent = r.name || 'Unknown Practice';
+  document.getElementById('modalSpec').textContent = (r.city || '') + (r.state ? ', ' + r.state : '');
+
+  const emailRows = r.emails?.length > 0
+    ? r.emails.map(e => `<div class="modal-item"><div class="modal-label">Email</div><div class="modal-value">${escHtml(e)}</div></div>`).join('')
+    : '<div class="modal-item"><div class="modal-label">Email</div><div class="modal-value" style="color:var(--muted)">None found</div></div>';
+
+  document.getElementById('modalGrid').innerHTML = `
+    ${emailRows}
+    <div class="modal-item"><div class="modal-label">Phone</div><div class="modal-value">${escHtml(r.phone || '—')}</div></div>
+    <div class="modal-item" style="grid-column:1/-1"><div class="modal-label">Address</div><div class="modal-value">${escHtml(r.address || '—')}</div></div>
+    <div class="modal-item"><div class="modal-label">Google Rating</div><div class="modal-value">${r.rating ? '⭐ ' + r.rating + ' (' + r.reviews + ' reviews)' : '—'}</div></div>
+    <div class="modal-item"><div class="modal-label">Website</div><div class="modal-value"><a href="${escHtml(r.website || '#')}" target="_blank" style="color:var(--teal)">${escHtml(r.website || '—')}</a></div></div>
+    <div class="modal-item" style="grid-column:1/-1"><div class="modal-label">Social Profiles</div><div class="modal-value" style="font-size:13px">${r.social?.join('<br>') || '—'}</div></div>
+  `;
+
+  activeModal = r;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+// ── RENDER NPI (kept as fallback) ──
 function renderResults(results, total) {
   const container = document.getElementById('resultsContainer');
   const limit = parseInt(document.getElementById('filterLimit').value) || 20;
@@ -903,20 +1041,19 @@ document.getElementById('modalCopyNPI').addEventListener('click', () => {
 document.getElementById('exportBtn').addEventListener('click', () => {
   if (!currentResults.length) { showToast('No results to export yet'); return; }
 
-  const rows = [['Name','NPI','Specialty','Phone','Address','State','Enrolled']];
+  const rows = [['Name','Email','Phone','Address','City','State','Website','Rating','Reviews','Social']];
   currentResults.forEach(r => {
-    const basic = r.basic || {};
-    const isOrg = r.enumeration_type === 'NPI-2';
-    const name = isOrg
-      ? (basic.organization_name || '')
-      : [basic.first_name, basic.last_name, basic.credential].filter(Boolean).join(' ');
-    const tax = (r.taxonomies || []).find(t => t.primary) || (r.taxonomies || [])[0] || {};
-    const addr = (r.addresses || []).find(a => a.address_purpose === 'LOCATION') || {};
-    const addrStr = [addr.address_1, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ');
     rows.push([
-      name, r.number || '', tax.desc || '',
-      addr.telephone_number || '', addrStr, addr.state || '',
-      basic.enumeration_date || ''
+      r.name || '',
+      (r.emails || []).join('; '),
+      r.phone || '',
+      r.address || '',
+      r.city || '',
+      r.state || '',
+      r.website || '',
+      r.rating || '',
+      r.reviews || '',
+      (r.social || []).join('; ')
     ]);
   });
 
