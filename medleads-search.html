@@ -487,6 +487,61 @@
     .card-meta { grid-template-columns: 1fr 1fr; }
     .modal-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── LEAD COUNT STEPPER ── */
+  .lead-stepper {
+    display: flex;
+    align-items: center;
+    background: var(--navy-3);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .lead-stepper:focus-within {
+    border-color: var(--teal-bdr);
+    box-shadow: 0 0 0 2px var(--teal-dim);
+  }
+  .stepper-btn {
+    background: transparent;
+    border: none;
+    color: var(--teal);
+    font-size: 18px;
+    font-weight: 600;
+    width: 38px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .stepper-btn:hover { background: var(--teal-dim); }
+  .stepper-btn:active { background: rgba(212,175,55,0.25); }
+  .stepper-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px 4px;
+    outline: none;
+    width: 0; /* flex handles sizing */
+    -moz-appearance: textfield;
+  }
+  /* Hide native browser arrows */
+  .stepper-input::-webkit-outer-spin-button,
+  .stepper-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 </style>
 </head>
 <body>
@@ -497,10 +552,9 @@
     <div class="logo-mark">ML</div>
     <span class="logo-text">Med<span>Leads</span></span>
   </a>
-  <div class="nav-search">
-    <input class="nav-input" id="navSpecialty" type="text" placeholder="Specialty (e.g. Cardiologists)" style="min-width:180px;border-right:1px solid var(--line);padding:11px 14px;background:var(--navy-3)">
-    <input class="nav-input" id="navCity" type="text" placeholder="City, State (e.g. Miami, Florida)">
-    <button class="nav-btn" id="navSearchBtn">Search →</button>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span id="navUserBadge" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:none"></span>
+    <a href="medleads-auth.html" style="font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);background:var(--teal);padding:8px 18px;border-radius:8px;text-decoration:none">Dashboard</a>
   </div>
 </nav>
 
@@ -511,7 +565,7 @@
   <aside class="sidebar">
     <div class="filter-group">
       <div class="filter-label">Specialty / Niche</div>
-      <input class="filter-input" id="filterSpecialty" type="text" placeholder="e.g. Orthopedic Surgeons">
+      <input class="filter-input" id="filterSpecialty" type="text" placeholder="e.g. Cardiologists">
     </div>
 
     <div class="filter-group">
@@ -530,17 +584,27 @@
     </div>
 
     <div class="filter-group">
-      <div class="filter-label">Results per page</div>
-      <select class="filter-select" id="filterLimit">
-        <option value="10">10</option>
-        <option value="20" selected>20</option>
-        <option value="50">50</option>
-      </select>
+      <div class="filter-label">Number of Leads</div>
+      <div class="lead-stepper">
+        <button class="stepper-btn" id="stepDown" type="button">−</button>
+        <input
+          type="number"
+          class="stepper-input"
+          id="filterLimit"
+          value="20"
+          min="1"
+          max="100"
+          step="1"
+          placeholder="20"
+        >
+        <button class="stepper-btn" id="stepUp" type="button">+</button>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px">Enter or use arrows · max 100</div>
     </div>
 
     <hr class="filter-divider">
 
-    <button class="filter-apply" id="applyFilters">Apply Filters</button>
+    <button class="filter-apply" id="applyFilters">Search Leads →</button>
     <button class="filter-reset" id="resetFilters">Reset</button>
 
     <div class="results-count-sidebar" id="sidebarCount">
@@ -627,6 +691,33 @@ const SPECIALTY_NAMES = {
 // ── NPI API ──
 // ── BACKEND + SUPABASE ──
 const BACKEND = 'https://medleads-backend-production.up.railway.app';
+
+// Clamp lead count input between 1 and 100
+document.addEventListener('DOMContentLoaded', () => {
+  const limitInput = document.getElementById('filterLimit');
+  if (limitInput) {
+    function clampLimit() {
+      let v = parseInt(limitInput.value) || 20;
+      if (v < 1) v = 1;
+      if (v > 100) v = 100;
+      limitInput.value = v;
+    }
+    limitInput.addEventListener('blur', clampLimit);
+    limitInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { clampLimit(); doSearch(); }
+    });
+
+    // Custom stepper buttons
+    document.getElementById('stepDown').addEventListener('click', () => {
+      let v = parseInt(limitInput.value) || 20;
+      limitInput.value = Math.max(1, v - 1);
+    });
+    document.getElementById('stepUp').addEventListener('click', () => {
+      let v = parseInt(limitInput.value) || 20;
+      limitInput.value = Math.min(100, v + 1);
+    });
+  }
+});
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -673,14 +764,9 @@ function showUpgradeWall(data) {
 }
 
 function buildParams() {
-  const navSpec = (document.getElementById('navSpecialty') || {value:''}).value.trim();
-  const sidebarSpec = (document.getElementById('filterSpecialty') || {value:''}).value.trim();
-  const navCity = (document.getElementById('navCity') || {value:''}).value.trim();
-  const sidebarLoc = (document.getElementById('filterState') || {value:''}).value.trim();
-
   return {
-    specialty: navSpec || sidebarSpec || '',
-    location: navCity || sidebarLoc || '',
+    specialty: (document.getElementById('filterSpecialty') || {value:''}).value.trim(),
+    location: (document.getElementById('filterState') || {value:''}).value.trim(),
     limit: (document.getElementById('filterLimit') || {value:'20'}).value || '20',
   };
 }
@@ -723,8 +809,8 @@ async function doSearch(resetPage = true) {
 function renderApifyResults(results) {
   const container = document.getElementById('resultsContainer');
 
-  const specialty = document.getElementById('navSpecialty')?.value || '';
-  const city = document.getElementById('navCity').value.trim();
+  const specialty = (document.getElementById('filterSpecialty')?.value || '').trim();
+  const city = (document.getElementById('filterState')?.value || '').trim();
 
   document.getElementById('resultsTitle').textContent = `${specialty || 'Physicians'} · ${city || 'All locations'}`;
   const requestedLimit = parseInt(document.getElementById('filterLimit')?.value || 20);
@@ -866,8 +952,8 @@ function renderResults(results, total) {
   const limit = parseInt(document.getElementById('filterLimit').value) || 20;
 
   // header
-  const specName = SPECIALTY_NAMES[document.getElementById('navSpecialty').value] || 'All Specialties';
-  const city = document.getElementById('navCity').value.trim();
+  const specName = SPECIALTY_NAMES[document.getElementById('filterSpecialty').value] || document.getElementById('filterSpecialty').value || 'All Specialties';
+  const city = (document.getElementById('filterState')?.value || '').trim();
   const state = document.getElementById('filterState').value;
   const loc = [city, state].filter(Boolean).join(', ') || 'All Locations';
 
@@ -1108,22 +1194,15 @@ function updatePills() {
   const container = document.getElementById('activePills');
   container.innerHTML = '';
 
-  const specEl = document.getElementById('navSpecialty');
-  const sidebarSpecEl = document.getElementById('filterSpecialty');
-  const cityEl = document.getElementById('navCity');
-  const locationEl = document.getElementById('filterState');
-
-  const specText = (specEl?.value || sidebarSpecEl?.value || '').trim();
-  const locationText = (cityEl?.value || locationEl?.value || '').trim();
+  const specText = (document.getElementById('filterSpecialty')?.value || '').trim();
+  const locationText = (document.getElementById('filterState')?.value || '').trim();
 
   if (specText) addPill(container, specText, () => {
-    if (specEl) specEl.value = '';
-    if (sidebarSpecEl) sidebarSpecEl.value = '';
+    document.getElementById('filterSpecialty').value = '';
     doSearch();
   });
   if (locationText) addPill(container, locationText, () => {
-    if (cityEl) cityEl.value = '';
-    if (locationEl) locationEl.value = '';
+    document.getElementById('filterState').value = '';
     doSearch();
   });
 }
@@ -1174,26 +1253,14 @@ function showToast(msg) {
 }
 
 // ── EVENTS ──
-document.getElementById('navSearchBtn').addEventListener('click', () => {
-  // Sync nav values to sidebar before searching
-  const navSpec = document.getElementById('navSpecialty').value.trim();
-  const navCity = document.getElementById('navCity').value.trim();
-  const fsEl = document.getElementById('filterSpecialty');
-  const flocEl = document.getElementById('filterState');
-  if (navSpec && fsEl) fsEl.value = navSpec;
-  if (navCity && flocEl) flocEl.value = navCity;
-  doSearch();
-});
-
-document.getElementById('navSpecialty').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('navSearchBtn').click(); });
-document.getElementById('navCity').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('navSearchBtn').click(); });
+// Enter key triggers search from sidebar inputs
+document.getElementById('filterSpecialty').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+document.getElementById('filterState').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
 document.getElementById('applyFilters').addEventListener('click', () => {
-  // Sync sidebar values to nav before searching
   const fsEl = document.getElementById('filterSpecialty');
   const flocEl = document.getElementById('filterState');
-  if (fsEl?.value) document.getElementById('navSpecialty').value = fsEl.value;
-  if (flocEl?.value) document.getElementById('navCity').value = flocEl.value;
+  // sidebar is the single source of truth
   doSearch();
 });
 
@@ -1203,8 +1270,7 @@ if (filterSpecEl) filterSpecEl.addEventListener('keydown', e => { if (e.key === 
 if (filterStateEl) filterStateEl.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('applyFilters').click(); });
 
 document.getElementById('resetFilters').addEventListener('click', () => {
-  document.getElementById('navSpecialty').value = '';
-  document.getElementById('navCity').value = '';
+  // sidebar inputs cleared above
   const fsEl = document.getElementById('filterState');
   const fspEl = document.getElementById('filterSpecialty');
   if (fsEl) fsEl.value = '';
@@ -1229,14 +1295,12 @@ const cachedEmail = urlParams.get('cached_email');
 const specParam = urlParams.get('specialty') || '';
 const cityParam = urlParams.get('city') || '';
 
-// Always populate inputs from URL params
+// Populate sidebar inputs from URL params
 if (specParam) {
-  document.getElementById('navSpecialty').value = specParam;
   const fsEl = document.getElementById('filterSpecialty');
   if (fsEl) fsEl.value = specParam;
 }
 if (cityParam) {
-  document.getElementById('navCity').value = cityParam;
   const flocEl = document.getElementById('filterState');
   if (flocEl) flocEl.value = cityParam;
 }
