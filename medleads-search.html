@@ -758,15 +758,11 @@ function renderApifyResults(results) {
       gap: 10px;
       line-height: 1.6;
     `;
-    banner.innerHTML = \`
-      <span style="font-size:16px;flex-shrink:0">ℹ️</span>
-      <span>
-        <strong style="color:var(--teal)">Why ${results.length} leads instead of ${requestedCount}?</strong><br>
-        We automatically remove duplicate listings so every lead is unique and actionable.
-        Google Maps sometimes lists the same practice multiple times under different names.
-        Try a broader search term (e.g. "Doctors" instead of "Cardiologists") or a larger city to get more results.
-      </span>
-    \`;
+    banner.innerHTML = '<span style="font-size:16px;flex-shrink:0">ℹ️</span>' +
+      '<span><strong style="color:var(--teal)">Why ' + results.length + ' leads instead of ' + requestedCount + '?</strong><br>' +
+      'We automatically remove duplicate listings so every lead is unique and actionable. ' +
+      'Google Maps sometimes lists the same practice multiple times. ' +
+      'Try a broader term (e.g. "Doctors") or a larger city to get more results.</span>';
     container.appendChild(banner);
   }
 
