@@ -800,6 +800,13 @@ async function doSearch(resetPage = true) {
     }
 
     renderApifyResults(currentResults);
+
+    // Show cache badge if result came from cache
+    if (data.cached) {
+      showToast('⚡ Instant result — loaded from shared cache');
+      const sub = document.getElementById('resultsSub');
+      if (sub) sub.innerHTML += ' &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#9889; Cached result</span>';
+    }
   } catch (e) {
     showState('⚠️', 'Search failed', 'Something went wrong. Try again in a moment. Error: ' + e.message);
   }
@@ -1318,7 +1325,7 @@ if (cachedSearchId && cachedEmail) {
         updatePills();
         renderApifyResults(currentResults);
         const sub = document.getElementById('resultsSub');
-        if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:10px">📁 Loaded from saved history</span>';
+        if (sub) sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
         showToast('Loaded from saved history — no credits used ✓');
       } else {
         doSearch();
