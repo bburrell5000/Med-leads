@@ -1113,7 +1113,6 @@ function updatePills() {
   const cityEl = document.getElementById('navCity');
   const locationEl = document.getElementById('filterState');
 
-  // Use nav as source of truth; sidebar mirrors it — only show one pill per concept
   const specText = (specEl?.value || sidebarSpecEl?.value || '').trim();
   const locationText = (cityEl?.value || locationEl?.value || '').trim();
 
