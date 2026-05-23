@@ -987,7 +987,7 @@
 <div class="page" id="page-dashboard">
   <div class="dashboard-page">
     <nav class="dash-nav">
-      <a class="dash-logo" onclick="void(0)">
+      <a class="dash-logo" href="index.html">
         <div class="dash-logo-mark">ML</div>
         <span class="dash-logo-text">Med<span>Leads</span></span>
       </a>
@@ -1320,17 +1320,9 @@ function loadDashboard() {
   document.getElementById('usageNums').textContent = `${leadsUsed} / ${limitDisplay} leads`;
   document.getElementById('usageBar').style.width = Math.max(pct, 1) + '%';
 
-  // Upgrade nudge — hide it for paid plans, show for free
+  // Upgrade nudge — hide for paid plans
   const nudge = document.getElementById('upgradeNudge');
-  if (nudge) {
-    if (isPaid) {
-      nudge.style.display = 'none';
-    } else {
-      nudge.style.display = '';
-      document.getElementById('upgradeNudgeText').innerHTML =
-        `You get <strong>20 free leads</strong> to start. Upgrade for 500–10,000 leads/month with full email + social data.`;
-    }
-  }
+  if (nudge) nudge.style.display = isPaid ? 'none' : '';
 }
 
 async function handleLogout() {
