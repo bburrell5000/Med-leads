@@ -687,12 +687,24 @@ function showUpgradeWall(data) {
 }
 
 function buildParams() {
+  // Nav specialty dropdown value (text-based option text, not taxonomy code)
+  const navSpecEl = document.getElementById('navSpecialty');
+  const navSpecValue = navSpecEl ? navSpecEl.options[navSpecEl.selectedIndex]?.text : '';
+  const navSpecClean = (navSpecValue === 'All Specialties' || !navSpecValue) ? '' : navSpecValue;
+  
+  // Sidebar specialty text input
+  const sidebarSpec = (document.getElementById('filterSpecialty') || {value:''}).value.trim();
+  
+  // Nav city field
+  const navCity = (document.getElementById('navCity') || {value:''}).value.trim();
+  
+  // Sidebar location
+  const sidebarLoc = (document.getElementById('filterState') || {value:''}).value.trim();
+
   return {
-    specialty: document.getElementById('navSpecialty')?.value?.trim() || 
-               document.getElementById('filterSpecialty')?.value?.trim() || '',
-    location: document.getElementById('navCity').value.trim() ||
-              document.getElementById('filterState').value.trim() || '',
-    limit: document.getElementById('filterLimit').value || '20',
+    specialty: navSpecClean || sidebarSpec || '',
+    location: navCity || sidebarLoc || '',
+    limit: (document.getElementById('filterLimit') || {value:'20'}).value || '20',
   };
 }
 
@@ -706,6 +718,8 @@ async function doSearch(resetPage = true) {
     showState('🔬', 'Add a filter to search', 'Enter a specialty (e.g. "Cardiologists") and a city to find verified physician emails.');
     return;
   }
+
+  console.log('Searching with params:', params);
 
   showLoading();
   updatePills();
@@ -1182,6 +1196,12 @@ function showToast(msg) {
 document.getElementById('navSearchBtn').addEventListener('click', () => doSearch());
 document.getElementById('navCity').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 document.getElementById('applyFilters').addEventListener('click', () => doSearch());
+
+// Also trigger search on Enter in sidebar fields
+const filterSpecEl = document.getElementById('filterSpecialty');
+const filterStateEl = document.getElementById('filterState');
+if (filterSpecEl) filterSpecEl.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+if (filterStateEl) filterStateEl.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
 document.getElementById('resetFilters').addEventListener('click', () => {
   document.getElementById('navSpecialty').value = '';
