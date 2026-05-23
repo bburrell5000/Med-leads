@@ -1357,7 +1357,8 @@
 </div>
 
 <script>
-// ── SUPABASE ──
+console.log('medleads-auth version: 2026-05-23-v3');
+// -- SUPABASE --
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1394,7 +1395,7 @@ async function checkSupabaseSession() {
       } else {
         params.set('specialty', urlQ);
       }
-      showToast(`Welcome back, ${currentUser.firstName}! Taking you to your search…`);
+      showToast(`Welcome back, ${currentUser.firstName}! Taking you to your search...`);
       setTimeout(() => {
         window.location.href = 'medleads-search.html?' + params.toString();
       }, 800);
@@ -1450,7 +1451,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
       } else {
         params.set('specialty', urlQ);
       }
-      showToast(`Welcome, ${currentUser.firstName}! Taking you to your search… 🎉`);
+      showToast(`Welcome, ${currentUser.firstName}! Taking you to your search... 🎉`);
       setTimeout(() => {
         window.location.href = 'medleads-search.html?' + params.toString();
       }, 800);
@@ -1461,10 +1462,10 @@ sb.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
-// ── BACKEND ──
+// -- BACKEND --
 const BACKEND = 'https://medleads-backend-production.up.railway.app';
 
-// ── LANDING PAGE ENTRY POINT ──
+// -- LANDING PAGE ENTRY POINT --
 // If visitor came from homepage, show sign-up page instead of upgrade wall
 (function() {
   const p = new URLSearchParams(window.location.search);
@@ -1476,7 +1477,7 @@ const BACKEND = 'https://medleads-backend-production.up.railway.app';
     const sub = document.getElementById('paywallSub');
     const q = p.get('q');
     if (icon) icon.textContent = '🔍';
-    if (eyebrow) eyebrow.textContent = 'Free · No credit card required';
+    if (eyebrow) eyebrow.textContent = 'Free . No credit card required';
     if (title) title.innerHTML = q
       ? `Search <em>${q}</em><br> -  sign in to get your 20 free leads.`
       : 'Get your <em>20 free leads</em><br> -  start searching now.';
@@ -1484,7 +1485,7 @@ const BACKEND = 'https://medleads-backend-production.up.railway.app';
   }
 })();
 
-// ── STATE ──
+// -- STATE --
 let currentUser = null;
 let selectedPlan = 'pro';
 let selectedPaywallPlan = 'pro';
@@ -1492,14 +1493,14 @@ let selectedPaywallPlan = 'pro';
 // Simulated user DB (in production: real backend)
 const users = {};
 
-// ── PAGE ROUTER ──
+// -- PAGE ROUTER --
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
 
-// ── PLAN SELECTION ──
+// -- PLAN SELECTION --
 function selectPlan(plan, el) {
   selectedPlan = plan;
   document.querySelectorAll('#page-signup .plan-opt').forEach(p => p.classList.remove('selected'));
@@ -1512,7 +1513,7 @@ function selectPaywallPlan(plan, el) {
   el.classList.add('selected');
 }
 
-// ── PASSWORD STRENGTH ──
+// -- PASSWORD STRENGTH --
 function checkPwStrength(pw) {
   const bars = ['pwb1','pwb2','pwb3','pwb4'];
   bars.forEach(id => {
@@ -1531,7 +1532,7 @@ function checkPwStrength(pw) {
   }
 }
 
-// ── VALIDATION ──
+// -- VALIDATION --
 function validate(id, errId, condition) {
   const input = document.getElementById(id);
   const err   = document.getElementById(errId);
@@ -1545,7 +1546,7 @@ function validate(id, errId, condition) {
   return true;
 }
 
-// ── SIGNUP ──
+// -- SIGNUP --
 function handleSignup() {
   const firstName = document.getElementById('su-first').value.trim();
   const lastName  = document.getElementById('su-last').value.trim();
@@ -1563,7 +1564,7 @@ function handleSignup() {
   // Simulate loading
   const btn = document.getElementById('signupBtn');
   btn.disabled = true; btn.classList.add('loading');
-  btn.textContent = 'Creating account…';
+  btn.textContent = 'Creating account...';
 
   // Call backend to create Stripe checkout session
   fetch(`${BACKEND}/create-checkout-session`, {
@@ -1574,7 +1575,7 @@ function handleSignup() {
   .then(r => r.json())
   .then(data => {
     btn.disabled = false; btn.classList.remove('loading');
-    btn.textContent = 'Start Searching →';
+    btn.textContent = 'Start Searching ->';
     if (data.url) {
       // Store user info locally before redirecting to Stripe
       localStorage.setItem('ml_user', JSON.stringify({ firstName, lastName, email, plan: selectedPlan }));
@@ -1585,12 +1586,12 @@ function handleSignup() {
   })
   .catch(err => {
     btn.disabled = false; btn.classList.remove('loading');
-    btn.textContent = 'Start Searching →';
+    btn.textContent = 'Start Searching ->';
     showToast('Connection error  -  try again');
   });
 }
 
-// ── LOGIN ──
+// -- LOGIN --
 function handleLogin() {
   const email = document.getElementById('li-email').value.trim();
   const pw    = document.getElementById('li-pw').value;
@@ -1602,11 +1603,11 @@ function handleLogin() {
 
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.classList.add('loading');
-  btn.textContent = 'Signing in…';
+  btn.textContent = 'Signing in...';
 
   setTimeout(() => {
     btn.disabled = false; btn.classList.remove('loading');
-    btn.textContent = 'Sign In →';
+    btn.textContent = 'Sign In ->';
 
     const user = users[email];
     if (user && user.pw === pw) {
@@ -1624,18 +1625,18 @@ function handleLogin() {
   }, 1200);
 }
 
-// ── DASHBOARD ──
+// -- DASHBOARD --
 function loadDashboard() {
   if (!currentUser) return;
 
   const planLimits = { free: 20, solo: 500, pro: 2000, team: 10000 };
-  const planLabels = { free: 'Free · 20 leads', solo: 'Solo · 500 leads/mo', pro: 'Pro · 2,000 leads/mo', team: 'Team · 10,000 leads · 5 Seats' };
+  const planLabels = { free: 'Free . 20 leads', solo: 'Solo . 500 leads/mo', pro: 'Pro . 2,000 leads/mo', team: 'Team . 10,000 leads . 5 Seats' };
   const planLimitDisplay = { free: '20', solo: '500', pro: '2,000', team: '10,000' };
 
   document.getElementById('dashFirstName').textContent = currentUser.firstName;
   document.getElementById('dashUserName').textContent  = currentUser.firstName + ' ' + (currentUser.lastName || '');
   document.getElementById('dashAvatar').textContent    = currentUser.firstName.charAt(0).toUpperCase();
-  document.getElementById('dashPlanBadge').textContent = planLabels[currentUser.plan] || 'Pro · 2,000 leads/mo';
+  document.getElementById('dashPlanBadge').textContent = planLabels[currentUser.plan] || 'Pro . 2,000 leads/mo';
 
   const limit = planLimits[currentUser.plan] || 20;
   const limitDisplay = planLimitDisplay[currentUser.plan] || '20';
@@ -1657,7 +1658,7 @@ function loadDashboard() {
     // Customize label based on current plan
     const nextPlan = { free: 'Solo', solo: 'Pro', pro: 'Team' };
     const next = nextPlan[currentUser.plan];
-    if (next) upgradeNavBtn.textContent = `Upgrade to ${next} ↑`;
+    if (next) upgradeNavBtn.textContent = `Upgrade to ${next} ^`;
   }
 
   const nudge = document.getElementById('upgradeNudge');
@@ -1674,17 +1675,17 @@ function loadDashboard() {
       if (leadsUsed === 0) {
         // Brand new user  -  encourage them to try free OR upgrade
         nudgeText.innerHTML = `Start with <strong>${limit} free leads</strong>  -  or upgrade now for 500-10,000 verified physician contacts per month.`;
-        if (nudgeBtn) nudgeBtn.textContent = 'View Upgrade Plans →';
-        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Try Free Leads First →'; }
+        if (nudgeBtn) nudgeBtn.textContent = 'View Upgrade Plans ->';
+        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Try Free Leads First ->'; }
       } else if (remaining > 0) {
         // Has used some but still has leads left
         nudgeText.innerHTML = `You have <strong>${remaining} free lead${remaining !== 1 ? 's' : ''} remaining</strong>. Upgrade anytime for 500-10,000 leads/month.`;
-        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Plan →';
-        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Keep Searching →'; }
+        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Plan ->';
+        if (nudgeFreeBtn) { nudgeFreeBtn.style.display = ''; nudgeFreeBtn.textContent = 'Keep Searching ->'; }
       } else {
         // Used all free leads
         nudgeText.innerHTML = `You've used all <strong>${limit} free leads</strong>. Upgrade to keep finding verified physician contacts.`;
-        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Now →';
+        if (nudgeBtn) nudgeBtn.textContent = 'Upgrade Now ->';
         if (nudgeFreeBtn) nudgeFreeBtn.style.display = 'none';
       }
     }
@@ -1718,7 +1719,7 @@ async function loadSearchHistory() {
 
     searches.forEach(s => {
       const date = new Date(s.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const query = [s.specialty, s.location].filter(Boolean).join(' · ') || 'Search';
+      const query = [s.specialty, s.location].filter(Boolean).join(' . ') || 'Search';
       const card = document.createElement('div');
       card.className = 'history-card';
       card.innerHTML = `
@@ -1730,7 +1731,7 @@ async function loadSearchHistory() {
           <div class="history-badge">${s.result_count} leads</div>
         </div>
         <div class="history-actions">
-          <button class="history-btn history-btn-primary" onclick="loadSavedSearch(${s.id}, ${JSON.stringify(s.specialty || '')}, ${JSON.stringify(s.location || '')})">View Saved Results →</button>
+          <button class="history-btn history-btn-primary" onclick="loadSavedSearch(${s.id}, ${JSON.stringify(s.specialty || '')}, ${JSON.stringify(s.location || '')})">View Saved Results -></button>
           <button class="history-btn history-btn-secondary" onclick="deleteSearch(${s.id}, this)">Delete</button>
         </div>
       `;
@@ -1744,7 +1745,7 @@ async function loadSearchHistory() {
 async function loadSavedSearch(id, specialty, location) {
   if (!currentUser?.email) return;
   try {
-    showToast('Loading saved results…');
+    showToast('Loading saved results...');
     // Pass the search ID and email directly in the URL  -  search page fetches from backend
     const params = new URLSearchParams();
     if (specialty) params.set('specialty', specialty);
@@ -1781,7 +1782,7 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── UPGRADE MODAL ──
+// -- UPGRADE MODAL --
 let selectedUpgradePlan = 'pro';
 const upgradePlanLabels = {
   solo: 'Solo  -  $79/mo',
@@ -1811,7 +1812,7 @@ function selectUpgradePlan(plan, el) {
   document.querySelectorAll('.upgrade-plan').forEach(p => p.classList.remove('selected'));
   if (el) el.classList.add('selected');
   const btn = document.getElementById('upgradeCtaBtn');
-  if (btn) btn.textContent = `Upgrade to ${upgradePlanLabels[plan]} →`;
+  if (btn) btn.textContent = `Upgrade to ${upgradePlanLabels[plan]} ->`;
 }
 
 async function startUpgrade() {
@@ -1821,7 +1822,7 @@ async function startUpgrade() {
   }
   const btn = document.getElementById('upgradeCtaBtn');
   btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout…';
+  btn.textContent = 'Redirecting to checkout...';
   try {
     const res = await fetch(`${BACKEND}/create-checkout-session`, {
       method: 'POST',
@@ -1834,12 +1835,12 @@ async function startUpgrade() {
     } else {
       showToast('Error: ' + (data.error || 'Something went wrong'));
       btn.disabled = false;
-      btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
+      btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} ->`;
     }
   } catch(e) {
     showToast('Connection error  -  try again');
     btn.disabled = false;
-    btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} →`;
+    btn.textContent = `Upgrade to ${upgradePlanLabels[selectedUpgradePlan]} ->`;
   }
 }
 
@@ -1867,10 +1868,10 @@ function launchSearch() {
   // In production: navigate to search page with params
   // For demo: open the search file
   window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
-  showToast('Opening search results…');
+  showToast('Opening search results...');
 }
 
-// ── TOAST ──
+// -- TOAST --
 function showToast(msg) {
   const t = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
