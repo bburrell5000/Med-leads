@@ -1222,9 +1222,54 @@ function escHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Auto-search if URL has params (future use)
+// Auto-search if URL has params
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('specialty') || urlParams.get('city')) {
+const cachedId = urlParams.get('cached');
+
+if (cachedId) {
+  // Load from sessionStorage cache — no Apify call, no lead credits used
+  const raw = sessionStorage.getItem('ml_cached_results');
+  if (raw) {
+    try {
+      const cached = JSON.parse(raw);
+      if (String(cached.id) === String(cachedId)) {
+        const spec = cached.specialty || '';
+        const loc = cached.location || '';
+        if (spec) {
+          document.getElementById('navSpecialty').value = spec;
+          const fsEl = document.getElementById('filterSpecialty');
+          if (fsEl) fsEl.value = spec;
+        }
+        if (loc) {
+          document.getElementById('navCity').value = loc;
+          const flocEl = document.getElementById('filterState');
+          if (flocEl) flocEl.value = loc;
+        }
+        currentResults = cached.results || [];
+        updatePills();
+
+        // Show a banner indicating these are cached results
+        setTimeout(() => {
+          renderApifyResults(currentResults);
+          // Add cached notice under the subtitle
+          const sub = document.getElementById('resultsSub');
+          if (sub) {
+            sub.innerHTML += ' &nbsp;·&nbsp; <span style="color:var(--teal);font-family:'IBM Plex Mono',monospace;font-size:10px">📁 Loaded from saved history</span>';
+          }
+          showToast('Loaded from saved search — no credits used ✓');
+        }, 300);
+        sessionStorage.removeItem('ml_cached_results'); // clean up
+      } else {
+        // ID mismatch — fall through to normal search
+        doSearch();
+      }
+    } catch(e) {
+      doSearch();
+    }
+  } else {
+    doSearch();
+  }
+} else if (urlParams.get('specialty') || urlParams.get('city')) {
   const spec = urlParams.get('specialty') || '';
   const city = urlParams.get('city') || '';
   if (spec) {
@@ -1237,7 +1282,7 @@ if (urlParams.get('specialty') || urlParams.get('city')) {
     const flocEl = document.getElementById('filterState');
     if (flocEl) flocEl.value = city;
   }
-  setTimeout(() => doSearch(), 500); // small delay to let page load
+  setTimeout(() => doSearch(), 500);
 }
 </script>
 </body>
