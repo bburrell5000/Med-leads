@@ -1109,15 +1109,24 @@ function updatePills() {
   container.innerHTML = '';
 
   const specEl = document.getElementById('navSpecialty');
-  const specText = specEl ? (specEl.value || '').trim() : '';
-  const city = (document.getElementById('navCity') || {value:''}).value.trim();
-  const state = (document.getElementById('filterState') || {value:''}).value.trim();
-  const specialty = (document.getElementById('filterSpecialty') || {value:''}).value.trim();
+  const sidebarSpecEl = document.getElementById('filterSpecialty');
+  const cityEl = document.getElementById('navCity');
+  const locationEl = document.getElementById('filterState');
 
-  if (specText) addPill(container, specText, () => { if(specEl) specEl.value = ''; doSearch(); });
-  if (city) addPill(container, city, () => { document.getElementById('navCity').value = ''; doSearch(); });
-  if (state) addPill(container, state, () => { document.getElementById('filterState').value = ''; doSearch(); });
-  if (specialty) addPill(container, specialty, () => { document.getElementById('filterSpecialty').value = ''; doSearch(); });
+  // Use nav as source of truth; sidebar mirrors it — only show one pill per concept
+  const specText = (specEl?.value || sidebarSpecEl?.value || '').trim();
+  const locationText = (cityEl?.value || locationEl?.value || '').trim();
+
+  if (specText) addPill(container, specText, () => {
+    if (specEl) specEl.value = '';
+    if (sidebarSpecEl) sidebarSpecEl.value = '';
+    doSearch();
+  });
+  if (locationText) addPill(container, locationText, () => {
+    if (cityEl) cityEl.value = '';
+    if (locationEl) locationEl.value = '';
+    doSearch();
+  });
 }
 
 function addPill(container, text, onRemove) {
