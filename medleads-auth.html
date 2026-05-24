@@ -1310,12 +1310,14 @@
 </div>
 
 
-        <!-- Previous Searches -->
-        <div class="history-section" id="historySection" style="display:none">
-          <div class="history-title">Previous Searches <span id="historyCount"></span></div>
-          <div id="historyLimitNote" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:14px;margin-top:-8px"></div>
-          <div class="history-grid" id="historyGrid"></div>
-        </div>
+<!-- PREVIOUS SEARCHES — only shown when signed in via loadSearchHistory() -->
+<div class="history-section" id="historySection" style="display:none">
+  <div style="max-width:1100px;margin:0 auto;padding:0 32px">
+    <div class="history-title">Previous Searches <span id="historyCount"></span></div>
+    <div id="historyLimitNote" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:14px;margin-top:-8px"></div>
+    <div class="history-grid" id="historyGrid"></div>
+  </div>
+</div>
 
 <!-- UPGRADE MODAL -->
 <div class="upgrade-modal-overlay" id="upgradeModalOverlay" onclick="if(event.target===this)closeUpgradeModal()">
@@ -1702,14 +1704,26 @@ async function loadSearchHistory() {
     const res = await fetch(`${BACKEND}/my-searches?email=${encodeURIComponent(currentUser.email)}`);
     const data = await res.json();
     const searches = data.searches || [];
+    const historyLimit = data.history_limit || 5;
+    const plan = data.plan || currentUser?.plan || 'free';
 
     const section = document.getElementById('historySection');
     const grid = document.getElementById('historyGrid');
     const countEl = document.getElementById('historyCount');
+    const limitEl = document.getElementById('historyLimitNote');
+
+    // Show plan-based limit note
+    const planLimitLabels = {
+      free: 'Showing your 5 most recent searches  -  upgrade for more history',
+      solo: 'Showing your 20 most recent searches',
+      pro: 'Showing your 50 most recent searches',
+      team: 'Showing your 100 most recent searches'
+    };
+    if (limitEl) limitEl.textContent = planLimitLabels[plan] || `Showing your ${historyLimit} most recent searches`;
 
     if (!searches.length) {
       section.style.display = 'block';
-      grid.innerHTML = '<div class="history-empty">No searches yet  -  run your first search above and it will appear here automatically.</div>';
+      grid.innerHTML = '<div class="history-empty">No searches yet  -  run your first search and it will appear here automatically.</div>';
       countEl.textContent = '';
       return;
     }
@@ -1723,22 +1737,22 @@ async function loadSearchHistory() {
       const query = [s.specialty, s.location].filter(Boolean).join(' . ') || 'Search';
       const card = document.createElement('div');
       card.className = 'history-card';
-      
+
       const viewBtn = document.createElement('button');
       viewBtn.className = 'history-btn history-btn-primary';
       viewBtn.textContent = 'View Saved Results ->';
       viewBtn.addEventListener('click', () => loadSavedSearch(s.id, s.specialty || '', s.location || ''));
-      
+
       const delBtn = document.createElement('button');
       delBtn.className = 'history-btn history-btn-secondary';
       delBtn.textContent = 'Delete';
-      delBtn.addEventListener('click', () => deleteSearch(s.id, delBtn));
-      
+      delBtn.addEventListener('click', () => confirmDeleteSearch(s.id, escHtml(query), delBtn));
+
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'history-actions';
       actionsDiv.appendChild(viewBtn);
       actionsDiv.appendChild(delBtn);
-      
+
       card.innerHTML = `
         <div class="history-card-top">
           <div>
@@ -1754,6 +1768,32 @@ async function loadSearchHistory() {
   } catch(e) {
     console.error('Failed to load search history:', e);
   }
+}
+
+function confirmDeleteSearch(id, query, btn) {
+  // Show inline confirmation on the button
+  const actionsDiv = btn.closest('.history-actions');
+  actionsDiv.innerHTML = '';
+
+  const msg = document.createElement('div');
+  msg.style.cssText = 'font-size:12px;color:var(--muted);flex:1;line-height:1.4';
+  msg.textContent = 'Are you sure? This cannot be undone.';
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'history-btn history-btn-secondary';
+  confirmBtn.style.cssText = 'border-color:var(--red);color:var(--red);flex-shrink:0';
+  confirmBtn.textContent = 'Yes, delete';
+  confirmBtn.addEventListener('click', () => deleteSearch(id, confirmBtn));
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'history-btn history-btn-primary';
+  cancelBtn.style.cssText = 'flex-shrink:0';
+  cancelBtn.textContent = 'Keep it';
+  cancelBtn.addEventListener('click', () => loadSearchHistory());
+
+  actionsDiv.appendChild(msg);
+  actionsDiv.appendChild(cancelBtn);
+  actionsDiv.appendChild(confirmBtn);
 }
 
 async function loadSavedSearch(id, specialty, location) {
@@ -1864,6 +1904,9 @@ async function startUpgrade() {
 }
 
 async function handleLogout() {
+  // Hide history section on logout
+  const hs = document.getElementById('historySection');
+  if (hs) hs.style.display = 'none';
   await sb.auth.signOut();
   currentUser = null;
   localStorage.removeItem('ml_user');
