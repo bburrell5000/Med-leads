@@ -860,6 +860,15 @@ async function doSearch(resetPage = true) {
 // ── RENDER APIFY RESULTS ──
 function renderApifyResults(results) {
   hideSearchBanner();
+  // On mobile, auto-scroll to results so user sees them immediately
+  if (window.innerWidth <= 768) {
+    setTimeout(() => {
+      const resultsArea = document.getElementById('resultsContainer');
+      if (resultsArea) {
+        resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 200);
+  }
   const container = document.getElementById('resultsContainer');
 
   const specialty = (document.getElementById('filterSpecialty')?.value || '').trim();
