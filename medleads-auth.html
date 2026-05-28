@@ -1396,7 +1396,11 @@ async function checkSupabaseSession() {
       if (data.plan) currentUser.plan = data.plan;
       currentUser.leadsUsed = data.leads_used || 0;
       currentUser.leadsLimit = data.leads_limit || 20;
-    } catch(e) {}
+      currentUser.onTrial = data.on_trial || false;
+      currentUser.trialEndsAt = data.trial_ends_at || null;
+    } catch(e) {
+      console.error('Failed to fetch user status:', e);
+    }
     loadDashboard();
 
     const urlQ = new URLSearchParams(window.location.search).get('q');
@@ -1451,7 +1455,11 @@ sb.auth.onAuthStateChange(async (event, session) => {
       if (data.plan) currentUser.plan = data.plan;
       currentUser.leadsUsed = data.leads_used || 0;
       currentUser.leadsLimit = data.leads_limit || 20;
-    } catch(e) {}
+      currentUser.onTrial = data.on_trial || false;
+      currentUser.trialEndsAt = data.trial_ends_at || null;
+    } catch(e) {
+      console.error('Failed to fetch user status:', e);
+    }
     loadDashboard();
 
     // If user came from homepage with a search query, send them straight to search
