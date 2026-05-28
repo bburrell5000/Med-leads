@@ -1254,6 +1254,7 @@
           <div class="dash-user-name" id="dashUserName">Brandon</div>
         </div>
         <button class="dash-logout" onclick="handleLogout()">Sign out</button>
+        <button class="dash-logout" id="cancelSubBtn" style="display:none;border-color:rgba(255,100,100,0.3);color:rgba(255,100,100,0.7)" onclick="cancelSubscription()">Cancel Plan</button>
       </div>
     </nav>
 
@@ -1817,7 +1818,7 @@ async function loadSavedSearch(id, specialty, location) {
     if (location) params.set('city', location);
     params.set('cached_id', id);
     params.set('cached_email', currentUser.email);
-    window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
+    window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
   } catch(e) {
     showToast('Could not open saved results');
   }
@@ -1827,7 +1828,7 @@ function rerunSearch(specialty, location) {
   const params = new URLSearchParams();
   if (specialty) params.set('specialty', specialty);
   if (location) params.set('city', location);
-  window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
+  window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
 }
 
 async function deleteSearch(id, btn) {
@@ -1914,6 +1915,59 @@ async function startUpgrade() {
   }
 }
 
+// ── CANCEL SUBSCRIPTION ──
+async function cancelSubscription() {
+  if (!currentUser?.email) return;
+  
+  // Show inline confirmation
+  const btn = document.getElementById('cancelSubBtn');
+  const original = btn.textContent;
+  btn.textContent = 'Are you sure?';
+  btn.style.borderColor = 'rgba(255,100,100,0.7)';
+  btn.style.color = 'rgba(255,100,100,1)';
+  
+  btn.onclick = async () => {
+    btn.textContent = 'Cancelling...';
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${BACKEND}/cancel-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentUser.email })
+      });
+      const data = await res.json();
+      if (data.cancelled) {
+        showToast(`Plan cancelled. Access continues until ${data.access_until}.`);
+        btn.style.display = 'none';
+        // Reset button for safety
+        btn.onclick = cancelSubscription;
+        btn.textContent = 'Cancel Plan';
+        btn.disabled = false;
+      } else {
+        showToast('Could not cancel - ' + (data.error || 'try again'));
+        btn.textContent = original;
+        btn.disabled = false;
+        btn.onclick = cancelSubscription;
+      }
+    } catch(e) {
+      showToast('Connection error - try again');
+      btn.textContent = original;
+      btn.disabled = false;
+      btn.onclick = cancelSubscription;
+    }
+  };
+  
+  // Reset if they don't confirm within 5 seconds
+  setTimeout(() => {
+    if (btn.textContent === 'Are you sure?') {
+      btn.textContent = original;
+      btn.style.borderColor = 'rgba(255,100,100,0.3)';
+      btn.style.color = 'rgba(255,100,100,0.7)';
+      btn.onclick = cancelSubscription;
+    }
+  }, 5000);
+}
+
 async function handleLogout() {
   // Hide history section on logout
   const hs = document.getElementById('historySection');
@@ -1940,7 +1994,7 @@ function launchSearch() {
 
   // In production: navigate to search page with params
   // For demo: open the search file
-  window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
+  window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
   showToast('Opening search results...');
 }
 
