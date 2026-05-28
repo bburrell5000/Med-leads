@@ -827,6 +827,31 @@ async function doSearch(resetPage = true) {
     return;
   }
 
+  // ── DUPLICATE SEARCH CHECK ──
+  // If user is signed in, check if they already searched this specialty+location
+  if (currentUser?.email) {
+    try {
+      const checkRes = await fetch(`${BACKEND}/my-searches?email=${encodeURIComponent(currentUser.email)}`);
+      const checkData = await checkRes.json();
+      const searches = checkData.searches || [];
+
+      // Normalize for comparison
+      const normalize = s => (s || '').toLowerCase().trim();
+      const matchingSearch = searches.find(s =>
+        normalize(s.specialty) === normalize(params.specialty) &&
+        normalize(s.location) === normalize(params.location)
+      );
+
+      if (matchingSearch) {
+        // Show a non-blocking warning with option to view saved or search fresh
+        showDuplicateWarning(matchingSearch, params);
+        return;
+      }
+    } catch(e) {
+      // If check fails, just proceed with search normally
+    }
+  }
+
   console.log('Searching with params:', params);
 
   showLoading();
@@ -835,10 +860,9 @@ async function doSearch(resetPage = true) {
   try {
     showSearchBanner();
     const data = await callApify(params.specialty, params.location, params.limit);
-    if (!data) return; // upgrade wall shown
+    if (!data) return;
     currentResults = data.results || [];
 
-    // Update usage display
     if (data.usage) {
       document.getElementById('sidebarCount').innerHTML =
         `<strong>${data.usage.leads_remaining}</strong> leads remaining this month`;
@@ -846,14 +870,81 @@ async function doSearch(resetPage = true) {
 
     renderApifyResults(currentResults);
 
-    // Show cache badge if result came from cache
     if (data.cached) {
-      showToast('⚡ Instant result — loaded from shared cache');
+      showToast('Instant result — loaded from shared cache');
       const sub = document.getElementById('resultsSub');
       if (sub) sub.innerHTML += ' &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#9889; Cached result</span>';
     }
   } catch (e) {
     showState('⚠️', 'Search failed', 'Something went wrong. Try again in a moment. Error: ' + e.message);
+  }
+}
+
+// ── DUPLICATE SEARCH WARNING ──
+function showDuplicateWarning(existingSearch, params) {
+  const date = new Date(existingSearch.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const container = document.getElementById('resultsContainer');
+  container.innerHTML = `
+    <div class="state-box" style="max-width:480px;margin:0 auto">
+      <div class="state-icon">📋</div>
+      <div class="state-title" style="font-size:20px">You searched this before</div>
+      <div class="state-sub" style="margin-bottom:24px">
+        You already searched <strong>${escHtml(params.specialty)} in ${escHtml(params.location)}</strong> on ${date} 
+        and got <strong>${existingSearch.result_count} leads</strong>.<br><br>
+        Loading saved results uses no lead credits. Searching again will use ${params.limit} new leads.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:100%">
+        <button onclick="loadSavedFromWarning(${existingSearch.id})" 
+          style="background:var(--teal);color:var(--navy);border:none;border-radius:8px;padding:13px;font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;width:100%">
+          View Saved Results — No Credits Used
+        </button>
+        <button onclick="forceNewSearch()" 
+          style="background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;width:100%">
+          Search Again Anyway — Uses ${params.limit} Leads
+        </button>
+      </div>
+    </div>`;
+  hideSearchBanner();
+}
+
+async function loadSavedFromWarning(searchId) {
+  if (!currentUser?.email) return;
+  try {
+    showLoading();
+    const res = await fetch(`${BACKEND}/my-searches/${searchId}?email=${encodeURIComponent(currentUser.email)}`);
+    const data = await res.json();
+    if (data.search?.results) {
+      currentResults = typeof data.search.results === 'string'
+        ? JSON.parse(data.search.results)
+        : data.search.results;
+      updatePills();
+      renderApifyResults(currentResults);
+      const sub = document.getElementById('resultsSub');
+      if (sub) sub.innerHTML += ' &nbsp;&middot;&nbsp; <span style="color:var(--teal);font-family:IBM Plex Mono,monospace;font-size:10px">&#128193; Loaded from saved history</span>';
+      showToast('Loaded from saved history — no credits used');
+    }
+  } catch(e) {
+    forceNewSearch();
+  }
+}
+
+async function forceNewSearch() {
+  // Bypass the duplicate check and search fresh
+  const params = buildParams();
+  showLoading();
+  updatePills();
+  try {
+    showSearchBanner();
+    const data = await callApify(params.specialty, params.location, params.limit);
+    if (!data) return;
+    currentResults = data.results || [];
+    if (data.usage) {
+      document.getElementById('sidebarCount').innerHTML =
+        `<strong>${data.usage.leads_remaining}</strong> leads remaining this month`;
+    }
+    renderApifyResults(currentResults);
+  } catch(e) {
+    showState('⚠️', 'Search failed', 'Something went wrong. Try again in a moment.');
   }
 }
 
