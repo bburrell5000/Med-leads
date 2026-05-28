@@ -448,14 +448,20 @@
   .preview-website { font-size: 11px; color: var(--teal); }
 
   .preview-overlay {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 55%;
-    background: linear-gradient(to bottom, transparent 0%, var(--navy) 75%);
+    position: absolute; bottom: 0; left: 0; right: 0; height: 65%;
+    background: linear-gradient(to bottom, transparent 0%, var(--navy) 60%);
     display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 16px; pointer-events: none;
+    padding-bottom: 24px; pointer-events: none;
   }
   .preview-overlay-text {
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
-    color: var(--muted); letter-spacing: .06em;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--teal);
+    letter-spacing: .01em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+    background: rgba(13,27,46,0.6);
+    padding: 10px 24px; border-radius: 8px;
+    border: 1px solid var(--teal-bdr);
   }
 
   /* Plan mini cards */
@@ -936,39 +942,6 @@
             </div>
           </div>
           <div class="preview-address">902 Congress Ave Suite 140 Austin Texas 78701 US</div>
-        </div>
-
-        <!-- Card 3: Blurred -->
-        <div class="preview-card blurred">
-          <div class="preview-card-top">
-            <div class="preview-left">
-              <div class="preview-avatar">SP</div>
-              <div>
-                <div class="preview-name">Sunstate Orthopedic Partners</div>
-                <div class="preview-spec">Miami, Florida</div>
-                <div class="preview-badges">
-                  <span class="preview-badge preview-badge-email">✓ Email found</span>
-                  <span class="preview-badge preview-badge-rating">★ 4.8</span>
-                </div>
-              </div>
-            </div>
-            <div class="preview-rating">★ 4.8 (119 reviews)</div>
-          </div>
-          <div class="preview-data-row">
-            <div class="preview-data-col">
-              <div class="preview-data-label">Email(s)</div>
-              <div class="preview-data-val">contact@sunstateortho.com</div>
-            </div>
-            <div class="preview-data-col">
-              <div class="preview-data-label">Phone</div>
-              <div class="preview-data-val">(305) 555-0871</div>
-            </div>
-            <div class="preview-data-col">
-              <div class="preview-data-label">Social</div>
-              <div class="preview-data-val"><a href="#">LinkedIn</a> · <a href="#">Instagram</a></div>
-            </div>
-          </div>
-          <div class="preview-address">1200 Brickell Ave Suite 500 Miami Florida 33131 US</div>
         </div>
 
         <div class="preview-overlay">
