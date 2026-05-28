@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedLeads — Free 30-Day Trial</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --navy: #0d1b2e; --navy-2: #132236; --teal: #d4af37;
+    --teal-dim: rgba(212,175,55,0.12); --teal-bdr: rgba(212,175,55,0.35);
+    --white: #f0f4f8; --muted: #6b8299; --line: rgba(255,255,255,0.08);
+  }
+  body {
+    background: var(--navy); color: var(--white);
+    font-family: 'Instrument Sans', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .card {
+    background: var(--navy-2); border: 1px solid var(--teal-bdr);
+    border-radius: 16px; padding: 48px 40px; max-width: 480px;
+    width: 100%; text-align: center;
+  }
+  .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; }
+  .logo-mark {
+    width: 40px; height: 40px; background: var(--teal); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--navy); font-weight: 500;
+  }
+  .logo-text { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--white); }
+  .logo-text span { color: var(--teal); }
+  .badge {
+    display: inline-block; background: var(--teal-dim); border: 1px solid var(--teal-bdr);
+    color: var(--teal); font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 100px; margin-bottom: 20px;
+  }
+  h1 { font-family: 'DM Serif Display', serif; font-size: 36px; line-height: 1.15; margin-bottom: 12px; }
+  h1 em { color: var(--teal); font-style: italic; }
+  .sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+  .perks { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; text-align: left; }
+  .perk { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--white); }
+  .perk-icon { color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .divider { height: 1px; background: var(--line); margin-bottom: 28px; }
+  .price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 8px; }
+  .price-now { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--teal); }
+  .price-then { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .cta-btn {
+    width: 100%; background: var(--teal); color: var(--navy);
+    border: none; border-radius: 10px; padding: 16px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity .2s; margin-bottom: 12px;
+  }
+  .cta-btn:hover { opacity: .88; }
+  .cta-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .fine { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); line-height: 1.6; }
+  .fine a { color: var(--teal); text-decoration: none; }
+  .back { margin-top: 20px; font-size: 13px; color: var(--muted); }
+  .back a { color: var(--teal); text-decoration: none; }
+  .error { color: #ff6b6b; font-size: 13px; margin-top: 8px; display: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-mark">ML</div>
+    <div class="logo-text">Med<span>Leads</span></div>
+  </div>
+
+  <div class="badge">Limited Offer — Solo Plan</div>
+
+  <h1>30 Days <em>Free.</em><br>Then $79/month.</h1>
+  <p class="sub">Try MedLeads Solo free for 30 days. Search any physician specialty in any city and get verified emails, phone numbers, and Google ratings — in under 2 minutes.</p>
+
+  <div class="perks">
+    <div class="perk"><span class="perk-icon">✓</span> 500 physician leads per month</div>
+    <div class="perk"><span class="perk-icon">✓</span> Verified emails + phone numbers</div>
+    <div class="perk"><span class="perk-icon">✓</span> All 62+ medical specialties</div>
+    <div class="perk"><span class="perk-icon">✓</span> CSV export to Excel / CRM</div>
+    <div class="perk"><span class="perk-icon">✓</span> Search history saved (20 searches)</div>
+    <div class="perk"><span class="perk-icon">✓</span> Cancel anytime — no contracts</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="price-row">
+    <div class="price-now">$0</div>
+    <div style="font-size:18px;color:var(--muted)">today</div>
+  </div>
+  <div class="price-then">Then $79/month starting day 31. Cancel anytime before.</div>
+
+  <button class="cta-btn" id="trialBtn" onclick="startTrial()">
+    Start My Free 30-Day Trial →
+  </button>
+
+  <div class="error" id="errorMsg"></div>
+
+  <p class="fine">
+    A valid card is required to start your trial. You won't be charged until day 31.<br>
+    Cancel anytime from your dashboard. By continuing you agree to our
+    <a href="medleads.org">terms</a>.
+  </p>
+</div>
+
+<div class="back"><a href="https://medleads.org">← Back to MedLeads</a></div>
+
+<script>
+const BACKEND = 'https://medleads-backend-production.up.railway.app';
+
+async function startTrial() {
+  const btn = document.getElementById('trialBtn');
+  const err = document.getElementById('errorMsg');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout...';
+  err.style.display = 'none';
+
+  try {
+    const res = await fetch(`${BACKEND}/create-trial-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Something went wrong');
+    }
+  } catch(e) {
+    err.textContent = 'Error: ' + e.message + '. Please try again.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Start My Free 30-Day Trial →';
+  }
+}
+</script>
+</body>
+</html>
