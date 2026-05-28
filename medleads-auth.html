@@ -842,14 +842,6 @@
   }
   .upgrade-close:hover { color: var(--white); }
 </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-45RBHHYFY7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-45RBHHYFY7');
-</script>
 </head>
 <body>
 
@@ -1825,7 +1817,7 @@ async function loadSavedSearch(id, specialty, location) {
     if (location) params.set('city', location);
     params.set('cached_id', id);
     params.set('cached_email', currentUser.email);
-    window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
+    window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
   } catch(e) {
     showToast('Could not open saved results');
   }
@@ -1835,7 +1827,7 @@ function rerunSearch(specialty, location) {
   const params = new URLSearchParams();
   if (specialty) params.set('specialty', specialty);
   if (location) params.set('city', location);
-  window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
+  window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
 }
 
 async function deleteSearch(id, btn) {
@@ -1948,7 +1940,7 @@ function launchSearch() {
 
   // In production: navigate to search page with params
   // For demo: open the search file
-  window.open(`https://bburrell5000.github.io/Med-leads/medleads-search.html?${params.toString()}`, '_blank');
+  window.open(`https://medleads.org/medleads-search.html?${params.toString()}`, '_blank');
   showToast('Opening search results...');
 }
 
