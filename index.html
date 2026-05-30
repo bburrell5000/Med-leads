@@ -1314,13 +1314,51 @@
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // Search interaction
+  // Search button
   document.getElementById('heroBtn').addEventListener('click', () => {
-    window.location.href = 'medleads-auth.html';
+    const hasSession = Object.keys(localStorage).some(k => k.includes('supabase') || k.includes('sb-'));
+    window.location.href = hasSession ? 'medleads-search.html' : 'medleads-auth.html?signup=1';
   });
-  document.getElementById('heroSearch').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') window.location.href = 'medleads-auth.html';
-  });
+
+  // ── HERO TYPING ANIMATION ──
+  const heroExamples = [
+    'Cardiologists in Miami, Florida',
+    'Dermatologists in Phoenix, Arizona',
+    'Orthopedic Surgeons in Dallas, Texas',
+    'Family Physicians in Chicago, Illinois',
+    'Oncologists in Los Angeles, California',
+    'Neurologists in Houston, Texas',
+    'Pediatricians in Atlanta, Georgia',
+    'Urologists in Seattle, Washington',
+  ];
+  let heroIdx = 0, heroCharIdx = 0, heroDeleting = false;
+
+  function heroType() {
+    const el = document.getElementById('heroTyped');
+    if (!el) return;
+    const current = heroExamples[heroIdx];
+    if (!heroDeleting) {
+      heroCharIdx++;
+      el.textContent = current.slice(0, heroCharIdx);
+      if (heroCharIdx === current.length) {
+        heroDeleting = true;
+        setTimeout(heroType, 2200);
+        return;
+      }
+      setTimeout(heroType, 55);
+    } else {
+      heroCharIdx--;
+      el.textContent = current.slice(0, heroCharIdx);
+      if (heroCharIdx === 0) {
+        heroDeleting = false;
+        heroIdx = (heroIdx + 1) % heroExamples.length;
+        setTimeout(heroType, 400);
+        return;
+      }
+      setTimeout(heroType, 28);
+    }
+  }
+  heroType();
 
 // ── MOBILE MENU — global scope so onclick attributes work ──
 function toggleMobileMenu() {
