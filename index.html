@@ -237,6 +237,14 @@
   }
 
   .search-input::placeholder { color: var(--muted); }
+  .hero-cursor {
+    display: inline-block;
+    color: var(--teal);
+    font-weight: 300;
+    animation: blink .7s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
   .search-btn {
     background: var(--teal);
@@ -1000,12 +1008,14 @@
     Get 20 verified physician leads free — including emails, phone numbers, and Google ratings. No credit card. No time limit. Just results.
   </p>
 
-  <div class="search-wrap">
-    <input class="search-input" type="text" id="heroSearch" placeholder="e.g. Family physicians in Phoenix, Arizona" style="flex:1">
+  <div class="search-wrap" style="cursor:default">
+    <div class="search-input" id="heroAnimated" style="flex:1;cursor:default;user-select:none;display:flex;align-items:center;gap:0">
+      <span id="heroTyped" style="color:var(--white)"></span><span class="hero-cursor" id="heroCursor">|</span>
+    </div>
     <button class="search-btn" id="heroBtn">Search Leads →</button>
   </div>
 
-  <p class="hero-hint">Try: <span>Cardiologists in Miami, Florida</span> · <span>Orthopedic Surgeons in Dallas, Texas</span></p>
+  <p class="hero-hint">Any specialty · Any city · Results in under 2 minutes</p>
 </section>
 
 <!-- TICKER -->
