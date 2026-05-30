@@ -1311,6 +1311,42 @@
   document.getElementById('heroSearch').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') window.location.href = 'medleads-auth.html';
   });
+
+// ── MOBILE MENU — global scope so onclick attributes work ──
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+}
+
+// Close when clicking outside
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  if (menu && btn && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    closeMobileMenu();
+  }
+});
+
+// Smooth scroll for mobile menu anchor links
+document.querySelectorAll('.mobile-menu a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    closeMobileMenu();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      setTimeout(function() {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+  });
+});
 </script>
 </body>
 </html>
