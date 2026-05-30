@@ -1657,6 +1657,10 @@ function loadDashboard() {
     if (next) upgradeNavBtn.textContent = `Upgrade to ${next} ^`;
   }
 
+  // Show cancel button for paid plans only
+  const cancelSubBtn = document.getElementById('cancelSubBtn');
+  if (cancelSubBtn) cancelSubBtn.style.display = isPaid ? '' : 'none';
+
   const nudge = document.getElementById('upgradeNudge');
   const nudgeText = document.getElementById('upgradeNudgeText');
   const nudgeBtn = document.getElementById('nudgeBtn');
