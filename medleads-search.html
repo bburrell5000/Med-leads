@@ -689,8 +689,7 @@
     <div class="modal-grid" id="modalGrid"></div>
     <hr class="modal-divider">
     <div class="modal-actions">
-      <button class="modal-btn modal-btn-primary" id="modalAddLead">+ Add to Lead List</button>
-      <button class="modal-btn modal-btn-secondary" id="modalCopyNPI">Copy NPI</button>
+      <button class="modal-btn modal-btn-primary" id="modalAddLead">+ Export This Lead</button>
     </div>
   </div>
 </div>
@@ -1282,18 +1281,30 @@ document.getElementById('modalOverlay').addEventListener('click', (e) => {
 });
 
 document.getElementById('modalAddLead').addEventListener('click', () => {
-  if (activeModal) {
-    leadList.push(activeModal);
-    showToast(`Lead added! (${leadList.length} total in list)`);
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-});
-
-document.getElementById('modalCopyNPI').addEventListener('click', () => {
-  if (activeModal) {
-    navigator.clipboard.writeText(activeModal.number || '').catch(() => {});
-    showToast('NPI number copied to clipboard');
-  }
+  if (!activeModal) return;
+  const r = activeModal;
+  const rows = [
+    ['Name','Email','Phone','Address','Website','Rating','Reviews','Social'],
+    [
+      r.name || '',
+      (r.emails || []).join('; '),
+      r.phone || '',
+      r.address || '',
+      r.website || '',
+      r.rating || '',
+      r.reviews || '',
+      (r.social_profiles || []).join('; ')
+    ]
+  ];
+  const csv = rows.map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(r.name || 'lead').replace(/[^a-z0-9]/gi,'_')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Lead exported to CSV');
 });
 
 // ── EXPORT CSV ──
