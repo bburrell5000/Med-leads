@@ -72,7 +72,7 @@
 
   <div class="badge">Limited Offer — Solo Plan</div>
 
-  <h1>30 Days <em>Free.</em><br>Then $79/month.</h1>
+  <h1>30 Days <em>Free.</em></h1>
   <p class="sub">Try MedLeads Solo free for 30 days. Search any physician specialty in any city and get verified emails, phone numbers, and Google ratings — in under 2 minutes.</p>
 
   <div class="perks">
@@ -88,20 +88,19 @@
 
   <div class="price-row">
     <div class="price-now">$0</div>
-    <div style="font-size:18px;color:var(--muted)">today</div>
+    <div style="font-size:18px;color:var(--muted)">for 30 days</div>
   </div>
-  <div class="price-then">Then $79/month starting day 31. Cancel anytime before.</div>
+  <div class="price-then">No credit card required. After 30 days, continue for $79/month or stay on the free plan.</div>
 
   <button class="cta-btn" id="trialBtn" onclick="startTrial()">
-    Start My Free 30-Day Trial →
+    Start My Free Trial — No Card Needed →
   </button>
 
   <div class="error" id="errorMsg"></div>
 
   <p class="fine">
-    A valid card is required to start your trial. You won't be charged until day 31.<br>
-    Cancel anytime from your dashboard. By continuing you agree to our
-    <a href="medleads.org">terms</a>.
+    Sign in with Google to activate your 30-day Solo trial instantly.<br>
+    No credit card. No commitment. Cancel anytime.
   </p>
 </div>
 
@@ -110,31 +109,9 @@
 <script>
 const BACKEND = 'https://medleads-backend-production.up.railway.app';
 
-async function startTrial() {
-  const btn = document.getElementById('trialBtn');
-  const err = document.getElementById('errorMsg');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout...';
-  err.style.display = 'none';
-
-  try {
-    const res = await fetch(`${BACKEND}/create-trial-session`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error(data.error || 'Something went wrong');
-    }
-  } catch(e) {
-    err.textContent = 'Error: ' + e.message + '. Please try again.';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Start My Free 30-Day Trial →';
-  }
+function startTrial() {
+  // No-card trial: redirect to sign-in, plan upgraded manually after signup
+  window.location.href = 'https://medleads.org/medleads-auth.html?trial=1';
 }
 </script>
 </body>

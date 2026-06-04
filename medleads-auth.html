@@ -1383,6 +1383,21 @@ async function checkSupabaseSession() {
   }
 }
 
+// Show trial welcome banner on sign-in page if arriving from trial link
+setTimeout(() => {
+  const urlTrial = new URLSearchParams(window.location.search).get('trial');
+  if (urlTrial) {
+    const card = document.querySelector('.paywall-card');
+    if (card && !document.getElementById('trialWelcomeBanner')) {
+      const banner = document.createElement('div');
+      banner.id = 'trialWelcomeBanner';
+      banner.style.cssText = 'background:rgba(212,175,55,0.12);border:1.5px solid rgba(212,175,55,0.4);border-radius:10px;padding:14px 18px;text-align:center;margin-bottom:16px';
+      banner.innerHTML = '<div style="font-family:\'DM Serif Display\',serif;font-size:18px;color:#f0f4f8;margin-bottom:4px">Your 30-day free trial is one click away</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:#6b8299">Sign in below — no credit card required</div>';
+      card.insertBefore(banner, card.firstChild);
+    }
+  }
+}, 600);
+
 // Google Sign In
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
