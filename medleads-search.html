@@ -718,6 +718,7 @@ let currentSkip = 0;
 let currentParams = {};
 let activeModal = null;
 let leadList = [];
+let currentUser = null;
 
 const SPECIALTY_NAMES = {
   '207X00000X': 'Orthopedic Surgery',
@@ -760,6 +761,14 @@ document.getElementById('filterLimit').addEventListener('keydown', (e) => {
 const SUPABASE_URL = 'https://ajnlinwqjzwpzfevkjdu.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqbmxpbndxanp3cHpmZXZramR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzI5NDEsImV4cCI6MjA5NTA0ODk0MX0.HDCvwPczfBB2TZBoBTfm1ZiW5Q_kLMmtOUV_Hp76pCA';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Populate currentUser on load and on any auth state change
+sb.auth.getSession().then(({ data: { session } }) => {
+  currentUser = session?.user || null;
+});
+sb.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user || null;
+});
 
 // Get current user email from Supabase session
 async function getCurrentUserEmail() {
